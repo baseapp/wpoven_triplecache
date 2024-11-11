@@ -265,7 +265,7 @@ class WPOCF_Cloudflare
 
         $cf_headers           = $this->get_api_headers();
         $cf_headers['method'] = 'PATCH';
-        $cf_headers['body']   = json_encode(array('value' => $ttl));
+        $cf_headers['body']   = wp_json_encode(array('value' => $ttl));
 
         $response = wp_remote_post(
             esc_url_raw("https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/settings/browser_cache_ttl"),
@@ -352,7 +352,7 @@ class WPOCF_Cloudflare
         $url = $this->main_instance->home_url('/*');
 
         $cf_headers['method'] = 'POST';
-        $cf_headers['body'] = json_encode(
+        $cf_headers['body'] = wp_json_encode(
             array(
                 'targets' => array(
                     array(
@@ -415,7 +415,7 @@ class WPOCF_Cloudflare
         $url = admin_url('/*');
 
         $cf_headers['method'] = 'POST';
-        $cf_headers['body'] = json_encode(array('targets' => array(array('target' => 'url', 'constraint' => array('operator' => 'matches', 'value' => $url))), 'actions' => array(array('id' => 'cache_level', 'value' => 'bypass')), 'priority' => 1, 'status' => 'active'));
+        $cf_headers['body'] = wp_json_encode(array('targets' => array(array('target' => 'url', 'constraint' => array('operator' => 'matches', 'value' => $url))), 'actions' => array(array('id' => 'cache_level', 'value' => 'bypass')), 'priority' => 1, 'status' => 'active'));
 
         $response = wp_remote_post(
             esc_url_raw("https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/pagerules"),
@@ -460,7 +460,7 @@ class WPOCF_Cloudflare
 
         $cf_headers           = $this->get_api_headers();
         $cf_headers['method'] = 'POST';
-        $cf_headers['body']   = json_encode(array('purge_everything' => true));
+        $cf_headers['body']   = wp_json_encode(array('purge_everything' => true));
 
         $response = wp_remote_post(
             esc_url_raw("https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/purge_cache"),
@@ -519,7 +519,7 @@ class WPOCF_Cloudflare
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POST => 1,
                 CURLOPT_HTTPHEADER => $cf_headers['headers'],
-                CURLOPT_POSTFIELDS => json_encode(array('files' => array_values($single_chunk))),
+                CURLOPT_POSTFIELDS => wp_json_encode(array('files' => array_values($single_chunk))),
             ));
 
             curl_multi_add_handle($multi_curl, $curl_array[$curl_index]);
@@ -570,7 +570,7 @@ class WPOCF_Cloudflare
             $this->purge_cache_urls_async($urls);
         } else {
 
-            $cf_headers['body'] = json_encode(array('files' => array_values($urls)));
+            $cf_headers['body'] = wp_json_encode(array('files' => array_values($urls)));
 
             $response = wp_remote_post(
                 esc_url_raw("https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/purge_cache"),
@@ -870,11 +870,11 @@ class WPOCF_Cloudflare
             $return_array['status'] = 'error';
             $return_array['error'] = $error;
 
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $return_array['success_msg'] = __('Page caching is working properly', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 }

@@ -197,11 +197,11 @@ class WPOCF_Cache_Controller
             if (strlen($_SERVER['QUERY_STRING']) > 0 && strpos($_SERVER['QUERY_STRING'], $this->get_cache_buster()) !== false) {
 
                 // Build the full URL
-                $parts = parse_url(home_url());
+                $parts = wp_parse_url(home_url());
                 $current_uri = "{$parts['scheme']}://{$parts['host']}" . add_query_arg(NULL, NULL);
 
                 // Strip out the cache buster
-                $parsed = parse_url($current_uri);
+                $parsed = wp_parse_url($current_uri);
                 $query_string = $parsed['query'];
 
                 parse_str($query_string, $params);
@@ -1378,14 +1378,14 @@ class WPOCF_Cache_Controller
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $this->purge_all(false, false, true);
 
         $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 
     function ajax_purge_whole_cache()
@@ -1400,14 +1400,14 @@ class WPOCF_Cache_Controller
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $this->purge_all(false, false);
 
         $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 
     function ajax_purge_single_post_cache()
@@ -1425,7 +1425,7 @@ class WPOCF_Cache_Controller
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $post_id = (int) $data['post_id'];
@@ -1435,11 +1435,11 @@ class WPOCF_Cache_Controller
         if (!$this->purge_urls($urls, false)) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('An error occurred while cleaning the cache. Please check log file for further details.', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
         $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 
     function ajax_reset_all()
@@ -1452,14 +1452,14 @@ class WPOCF_Cache_Controller
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $this->reset_all();
 
         $return_array['success_msg'] = __('Cloudflare and all configurations have been reset to the initial settings.', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 
     function is_purge_cache_queue_writable()
@@ -1527,7 +1527,7 @@ class WPOCF_Cache_Controller
                 $urls = array();
             $wpocf_cache_queue = array('purge_all' => $purge_all, 'urls' => $urls);
         }
-        file_put_contents($cache_queue_path, json_encode($wpocf_cache_queue));
+        file_put_contents($cache_queue_path, wp_json_encode($wpocf_cache_queue));
 
         $this->unlock_cache_purge_queue();
     }
@@ -1614,8 +1614,8 @@ class WPOCF_Cache_Controller
     function is_external_link($url)
     {
 
-        $source = parse_url(home_url());
-        $target = parse_url($url);
+        $source = wp_parse_url(home_url());
+        $target = wp_parse_url($url);
 
         if (!$source || empty($source['host']) || !$target || empty($target['host']))
             return false;
@@ -1661,18 +1661,18 @@ class WPOCF_Cache_Controller
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         if (!$this->objects['cloudflare']->enable_page_cache($error)) {
             $return_array['status'] = 'error';
             $return_array['error'] = $error;
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $return_array['success_msg'] = __('Page cache enabled successfully', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 
     function ajax_disable_page_cache()
@@ -1688,17 +1688,17 @@ class WPOCF_Cache_Controller
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
             $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         if (!$this->objects['cloudflare']->disable_page_cache($error)) {
             $return_array['status'] = 'error';
             $return_array['error'] = $error;
-            die(json_encode($return_array));
+            die(wp_json_encode($return_array));
         }
 
         $return_array['success_msg'] = __('Page cache disabled successfully', 'WPOven Triple Cache');
 
-        die(json_encode($return_array));
+        die(wp_json_encode($return_array));
     }
 }

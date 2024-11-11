@@ -330,7 +330,7 @@ class Wpoven_Triple_Cache_Admin
 	function get_plugin_wp_content_directory()
 	{
 
-		$parts = parse_url(home_url());
+		$parts = wp_parse_url(home_url());
 
 		return WP_CONTENT_DIR . "/wpoven-cloudflare-cache/{$parts['host']}";
 	}
@@ -346,7 +346,7 @@ class Wpoven_Triple_Cache_Admin
 	function get_second_level_domain()
 	{
 
-		$site_hostname = parse_url(home_url(), PHP_URL_HOST);
+		$site_hostname = wp_parse_url(home_url(), PHP_URL_HOST);
 
 		if (is_null($site_hostname)) {
 			return '';
@@ -512,7 +512,7 @@ class Wpoven_Triple_Cache_Admin
 			if (is_ssl() && !is_admin() && 'wp-login.php' !== $pagenow)
 				$scheme = 'https';
 			else
-				$scheme = parse_url($url, PHP_URL_SCHEME);
+				$scheme = wp_parse_url($url, PHP_URL_SCHEME);
 		}
 
 		$url = set_url_scheme($url, $scheme);
@@ -755,7 +755,7 @@ class Wpoven_Triple_Cache_Admin
 						continue;
 					}
 
-					$parsed_url = parse_url(str_replace(array("\r", "\n"), '', $single_url));
+					$parsed_url = wp_parse_url(str_replace(array("\r", "\n"), '', $single_url));
 
 					if ($parsed_url && isset($parsed_url['path'])) {
 
