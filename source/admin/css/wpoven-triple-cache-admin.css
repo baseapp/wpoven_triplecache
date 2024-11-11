@@ -1,0 +1,41 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+ .csf-content-gray {
+  color: #fff;
+  background-color: #121416;
+}
+.wpocf_please_wait {
+  /*margin-top: 30px;*/
+  width: 100%;
+  /*height: 100%;*/
+  background: #fff url('../img/please_wait.gif') center center;
+  background-repeat: no-repeat;
+  position: fixed;
+  z-index: 99999;
+  opacity: 0.9;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.wpocf_hide {
+	display: none !important;
+}
+
+#wp-admin-bar-wpocf-cache-toolbar-container.bullet-green .ab-icon::before,
+#wp-admin-bar-wpocf-cache-toolbar-container.bullet-green:hover .ab-icon::before {
+    content: "\f176";
+    color: #02ca02;
+    font-size: 16px;
+}
+
+#wp-admin-bar-wpocf-cache-toolbar-container.bullet-red .ab-icon::before,
+#wp-admin-bar-wpocf-cache-toolbar-container.bullet-red:hover .ab-icon::before {
+    content: "\f176";
+    color: #d40000;
+    font-size: 16px;
+}
+
