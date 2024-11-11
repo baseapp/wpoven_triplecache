@@ -702,7 +702,7 @@ class WPOCF_Cache_Controller
         if ($this->main_instance->get_single_config('cf_page_rule_id', '') != '') {
             $this->objects['cloudflare']->delete_page_rule($this->main_instance->get_single_config('cf_page_rule_id', ''), $error);
         }
-        
+
         // Restore default plugin config
         if ($keep_settings == false) {
             $this->main_instance->set_config($this->main_instance->get_default_config());
@@ -1482,12 +1482,24 @@ class WPOCF_Cache_Controller
 
     function purge_cache_queue_init_directory()
     {
-        $cache_path = $this->main_instance->get_plugin_wp_content_directory() . '/purge_cache_queue/';
-        if (!file_exists($cache_path) && wp_mkdir_p($cache_path)) {
-            file_put_contents($cache_path . 'index.php', '<?php // Silence is golden');
+        // Initialize the WP Filesystem API
+        global $wp_filesystem;
+        if (empty($wp_filesystem)) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
         }
+
+        $cache_path = $this->main_instance->get_plugin_wp_content_directory() . '/purge_cache_queue/';
+
+        // Create directory if it doesn’t exist
+        if (!file_exists($cache_path) && wp_mkdir_p($cache_path)) {
+            // Use WP_Filesystem to create the index.php file
+            $wp_filesystem->put_contents($cache_path . 'index.php', '<?php // Silence is golden');
+        }
+
         return $cache_path;
     }
+
 
     function purge_cache_queue_write($urls = array(), $purge_all = false)
     {

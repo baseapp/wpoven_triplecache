@@ -170,7 +170,7 @@ class WPOCF_Cloudflare
 
             $response_body = wp_remote_retrieve_body($response);
             $json = json_decode($response_body, true);
-           
+
             if ($json['success'] == false) {
 
                 $error = array();
@@ -217,7 +217,7 @@ class WPOCF_Cloudflare
             $error = __('Unable to find domains configured on Cloudflare', 'WPOven Triple Cache');
             return false;
         }
-       
+
         return $zone_id_list;
     }
 
@@ -496,60 +496,32 @@ class WPOCF_Cloudflare
 
     private function purge_cache_urls_async($urls)
     {
-
         $this->objects = $this->main_instance->get_objects();
-
         $cf_headers = $this->get_api_headers(true);
 
         $chunks = array_chunk($urls, 30);
 
-        $multi_curl = curl_multi_init();
-        $curl_array = array();
-        $curl_index = 0;
-
         foreach ($chunks as $single_chunk) {
+            $response = wp_remote_post("https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/purge_cache", [
+                'headers' => $cf_headers['headers'],
+                'timeout' => $cf_headers['timeout'],
+                'body' => wp_json_encode(['files' => array_values($single_chunk)]),
+                'method' => 'POST',
+            ]);
 
-            $curl_array[$curl_index] = curl_init();
-
-            curl_setopt_array($curl_array[$curl_index], array(
-                CURLOPT_URL => "https://api.cloudflare.com/client/v4/zones/{$this->zone_id}/purge_cache",
-                CURLOPT_RETURNTRANSFER => 1,
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => $cf_headers['timeout'],
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POST => 1,
-                CURLOPT_HTTPHEADER => $cf_headers['headers'],
-                CURLOPT_POSTFIELDS => wp_json_encode(array('files' => array_values($single_chunk))),
-            ));
-
-            curl_multi_add_handle($multi_curl, $curl_array[$curl_index]);
-
-            $curl_index++;
-        }
-
-        // execute the multi handle
-        $active = null;
-
-        do {
-
-            $status = curl_multi_exec($multi_curl, $active);
-
-            if ($active) {
-                // Wait a short time for more activity
-                curl_multi_select($multi_curl);
+            // Check for errors in the response
+            if (is_wp_error($response)) {
+                $error_message = $response->get_error_message();
+                // Log or handle the error as needed
+                error_log("Error purging cache: $error_message");
+                continue; // Skip to the next chunk if there's an error
             }
-        } while ($active && $status == CURLM_OK);
 
-        // close the handles
-        for ($i = 0; $i < $curl_index; $i++) {
-            curl_multi_remove_handle($multi_curl, $curl_array[$i]);
-        }
-
-        curl_multi_close($multi_curl);
-
-        // free up additional memory resources
-        for ($i = 0; $i < $curl_index; $i++) {
-            curl_close($curl_array[$i]);
+            // Optionally check for specific response code or body content
+            $response_code = wp_remote_retrieve_response_code($response);
+            if ($response_code !== 200) {
+                error_log("Failed to purge cache, response code: $response_code");
+            }
         }
 
         return true;
@@ -852,7 +824,7 @@ class WPOCF_Cloudflare
         $return_array['dynamic_resource_url'] = $url_dynamic_resource;
 
         $headers_dyamic_resource = $this->page_cache_test($url_dynamic_resource, $error_dynamic);
-    
+
         if (!$headers_dyamic_resource) {
 
             $headers_static_resource = $this->page_cache_test($url_static_resource, $error_static, true);
