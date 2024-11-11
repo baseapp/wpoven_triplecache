@@ -69,7 +69,7 @@ class WPOCF_Backend
          *
          * https://wordpress.stackexchange.com/questions/298762/wp-add-inline-script-without-dependency/311279#311279
          */
-        wp_register_script('wpocf_auto_prefetch_url', '', [], '', true);
+        wp_register_script('wpocf_auto_prefetch_url', '', [], '1.0.0', true);
         wp_enqueue_script('wpocf_auto_prefetch_url');
 
         // Making sure we are not adding the following inline script for AMP endpoints as they are not gonna work anyway and will be striped out by the AMP system

@@ -450,7 +450,6 @@ class Wpoven_Triple_Cache_Admin
 
 		if (!preg_match($pattern, $subject, $regs))
 			return false;
-
 		return true;
 	}
 

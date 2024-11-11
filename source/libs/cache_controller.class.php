@@ -1517,7 +1517,7 @@ class WPOCF_Cache_Controller
 
         if (file_exists($cache_queue_path)) {
 
-            $wpocf_cache_queue = json_decode(file_get_contents($cache_queue_path), true);
+            $wpocf_cache_queue = json_decode(wp_remote_get($cache_queue_path), true);
 
             if (!is_array($wpocf_cache_queue) || (is_array($wpocf_cache_queue) && (!isset($wpocf_cache_queue['purge_all']) || !isset($wpocf_cache_queue['urls'])))) {
                 $this->unlock_cache_purge_queue();
@@ -1539,7 +1539,15 @@ class WPOCF_Cache_Controller
                 $urls = array();
             $wpocf_cache_queue = array('purge_all' => $purge_all, 'urls' => $urls);
         }
-        file_put_contents($cache_queue_path, wp_json_encode($wpocf_cache_queue));
+
+        global $wp_filesystem;
+        // Load the WP_Filesystem API if not already loaded
+        if (empty($wp_filesystem)) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
+
+        $wp_filesystem->put_contents($cache_queue_path, wp_json_encode($wpocf_cache_queue), FS_CHMOD_FILE);
 
         $this->unlock_cache_purge_queue();
     }
@@ -1608,7 +1616,7 @@ class WPOCF_Cache_Controller
 
         $this->lock_cache_purge_queue();
 
-        $wpocf_cache_queue = json_decode(file_get_contents($cache_queue_path), true);
+        $wpocf_cache_queue = json_decode(wp_remote_get($cache_queue_path), true);
 
         if (isset($wpocf_cache_queue['purge_all']) && $wpocf_cache_queue['purge_all']) {
             $this->purge_all(false, false);
@@ -1616,7 +1624,7 @@ class WPOCF_Cache_Controller
             $this->purge_urls($wpocf_cache_queue['urls'], false);
         }
 
-        @unlink($cache_queue_path);
+        @wp_delete_file($cache_queue_path);
 
         $this->unlock_cache_purge_queue();
 
