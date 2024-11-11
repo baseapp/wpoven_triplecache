@@ -18,7 +18,7 @@ The WPOven Triple Cache plugin for WordPress uses Cloudflare integration to deli
 1. **Download the Plugin:**
      - To get the latest version of WPOven Triple Cache, you can either:
      - [Visit WPOven's website](https://www.wpoven.com/plugins/wpoven-triple-cache) to learn more about the plugin.
-     - Download directly from the GitHub repository: [Download](https://github.com/baseapp/wpoven_triplecache/releases/download/1.0.0/wpoven-triple-cache-2024-11-06.zip).
+     - Download directly from the GitHub repository: [Download](https://github.com/baseapp/wpoven_triplecache/releases/download/1.0.0/wpoven-triple-cache-2024-11-11.zip).
 
 2. **Upload the Plugin:**
    - Log in to your WordPress admin dashboard.
