@@ -16,7 +16,7 @@
  * Plugin Name:       WPOven Triple Cache
  * Plugin URI:        https://www.wpoven.com/plugins/wpoven-triple-cache
  * Description:       Cloudflare Caching
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            WPOven
  * Author URI:        https://www.wpoven.com/
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('WPOVEN_TRIPLE_CACHE_VERSION', '1.0.0');
+define('WPOVEN_TRIPLE_CACHE_VERSION', '1.0.1');
 if (!defined('WPOVEN_TRIPLE_CACHE_SLUG'))
 	define('WPOVEN_TRIPLE_CACHE_SLUG', 'wpoven-triple-cache');
 
@@ -78,18 +78,18 @@ require_once plugin_dir_path(__FILE__) . 'includes/libraries/plugin-update-check
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
-$myUpdateChecker = PucFactory::buildUpdateChecker(
+$wpoven_triple_cache_update_checker = PucFactory::buildUpdateChecker(
 	'https://github.com/baseapp/wpoven_triplecache/',
 	__FILE__,
 	'wpoven-triple-cache'
 );
-$myUpdateChecker->getVcsApi()->enableReleaseAssets();
+$wpoven_triple_cache_update_checker->getVcsApi()->enableReleaseAssets();
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-wpoven-triple-cache-activator.php
  */
-function activate_wpoven_triple_cache()
+function wpoven_triple_cache_activate()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-wpoven-triple-cache-activator.php';
 	Wpoven_Triple_Cache_Activator::activate();
@@ -99,14 +99,41 @@ function activate_wpoven_triple_cache()
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-wpoven-triple-cache-deactivator.php
  */
-function deactivate_wpoven_triple_cache()
+function wpoven_triple_cache_deactivate()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-wpoven-triple-cache-deactivator.php';
 	Wpoven_Triple_Cache_Deactivator::deactivate();
+
+	$dropin = WP_CONTENT_DIR . '/object-cache.php';
+
+	if (!file_exists($dropin)) {
+		return;
+	}
+
+	$contents = file_get_contents($dropin);
+
+	// Strict signature match
+	if (
+		strpos($contents, 'wpoven-triple-cache') !== false ||
+		strpos($contents, 'WP_PhpFastCache_Object_Cache') !== false
+	) {
+
+		// Initialize WP filesystem
+		global $wp_filesystem;
+		if (empty($wp_filesystem)) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		// Delete drop-in safely
+		if (!$wp_filesystem->delete($dropin)) {
+			error_log('WPOven Triple Cache: Failed to delete object-cache.php on deactivation');
+		}
+	}
 }
 
-register_activation_hook(__FILE__, 'activate_wpoven_triple_cache');
-register_deactivation_hook(__FILE__, 'deactivate_wpoven_triple_cache');
+register_activation_hook(__FILE__, 'wpoven_triple_cache_activate');
+register_deactivation_hook(__FILE__, 'wpoven_triple_cache_deactivate');
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -123,13 +150,11 @@ require plugin_dir_path(__FILE__) . 'includes/class-wpoven-triple-cache.php';
  *
  * @since    1.0.0
  */
-function run_wpoven_triple_cache()
-{
 
+add_action('plugins_loaded', function () {
 	$plugin = new Wpoven_Triple_Cache();
 	$plugin->run();
-}
-run_wpoven_triple_cache();
+});
 
 function wpoven_triple_cache_plugin_settings_link($links)
 {

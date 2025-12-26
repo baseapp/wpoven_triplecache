@@ -1,0 +1,6 @@
+{
+  "require": {
+    "phpfastcache/phpfastcache": "^8.1",
+    "shinsenter/defer.php": "^2.5"
+  }
+}

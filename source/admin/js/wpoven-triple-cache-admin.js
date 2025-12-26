@@ -89,7 +89,7 @@
         // Check if the email field is valid before submitting the form
         var emailField = document.querySelector('[id="wpocf_cf_email"]');
         if (emailField && !isValidEmail(emailField.value)) {
-          alert("Please enter a valid email address.");
+          //alert("Please enter a valid email address.");
           return false; // Prevent form submission
         }
 
@@ -98,7 +98,7 @@
         if (mode && mode.value === "0") {
           var apiKey = document.querySelector('[id="wpocf_cf_apikey"]');
           if (apiKey.value.trim() === "") {
-            alert("Please fill all required fields.");
+            // alert("Please fill all required fields.");
             return false;
           }
         } else {
@@ -110,7 +110,7 @@
             apiToken.value.trim() === "" ||
             apiTokenDomain.value.trim() === ""
           ) {
-            alert("Please fill all required fields.");
+            //alert("Please fill all required fields.");
             return false;
           }
         }
@@ -120,5 +120,122 @@
           form.submit();
         }, 2000);
       });
+  });
+
+  document.addEventListener("click", function (e) {
+    // Redis elements
+    const redisEnable = document.querySelector(
+      "#wpoven-triple-cache-redis_enable .cb-enable"
+    );
+    const redisDisable = document.querySelector(
+      "#wpoven-triple-cache-redis_enable .cb-disable"
+    );
+    const redisInput = document.querySelector(
+      "input[name='wpoven-triple-cache[redis_enable]']"
+    );
+
+    // File elements
+    const fileEnable = document.querySelector(
+      "#wpoven-triple-cache-file_enable .cb-enable"
+    );
+    const fileDisable = document.querySelector(
+      "#wpoven-triple-cache-file_enable .cb-disable"
+    );
+    const fileInput = document.querySelector(
+      "input[name='wpoven-triple-cache[file_enable]']"
+    );
+
+    if (!redisEnable || !fileEnable) return;
+
+    // If Redis is Enabled → Disable File Cache
+    if (
+      e.target.closest(".cb-enable") &&
+      e.target.closest("#wpoven-triple-cache-redis_enable")
+    ) {
+      // Set Redis ON
+      redisInput.value = "1";
+      redisEnable.classList.add("selected");
+      redisDisable.classList.remove("selected");
+
+      // Set File OFF
+      fileInput.value = "0";
+      fileEnable.classList.remove("selected");
+      fileDisable.classList.add("selected");
+    }
+
+    // If File Cache is Enabled → Disable Redis
+    if (
+      e.target.closest(".cb-enable") &&
+      e.target.closest("#wpoven-triple-cache-file_enable")
+    ) {
+      // Set File ON
+      fileInput.value = "1";
+      fileEnable.classList.add("selected");
+      fileDisable.classList.remove("selected");
+
+      // Set Redis OFF
+      redisInput.value = "0";
+      redisEnable.classList.remove("selected");
+      redisDisable.classList.add("selected");
+    }
+  });
+
+  async function flush_cache() {
+    const ajax_nonce = document.getElementById("wpoven-ajax-nonce").innerText;
+    const ajax_url = document.getElementById("wpoven-ajax-url").innerText;
+
+    try {
+      const response = await fetch(ajax_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        },
+        body: `action=wpoven_flush_object_cache&security=${ajax_nonce}`,
+        credentials: "same-origin",
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error flushing cache:", error);
+    }
+  }
+
+  async function flush_varnish_cache() {
+    const ajax_nonce = document.getElementById("wpoven-ajax-nonce").innerText;
+    const ajax_url = document.getElementById("wpoven-ajax-url").innerText;
+
+    try {
+      const response = await fetch(ajax_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        },
+        body: `action=wpoven_flush_varnish_cache&security=${ajax_nonce}`,
+        credentials: "same-origin",
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error flushing varnish cache:", error);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.id === "wpocf_redis_flush") {
+        flush_cache();
+      }
+      if (e.target && e.target.id === "varnish_cache_flush") {
+        flush_varnish_cache();
+      }
+    });
   });
 })(jQuery);

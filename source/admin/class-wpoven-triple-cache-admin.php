@@ -12,6 +12,10 @@
 
 use PSpell\Config;
 
+use Phpfastcache\CacheManager;
+use Phpfastcache\Config\ConfigurationOption;
+use Phpfastcache\Drivers\Redis\Config as RedisConfig;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -73,7 +77,58 @@ class Wpoven_Triple_Cache_Admin
 			$this->update_config();
 		}
 		$this->include_libs();
+
+		$composer = WP_CONTENT_DIR . '/plugins/wpoven-triple-cache/includes/libraries/vendor/autoload.php';
+
+		if (!file_exists($composer)) {
+			error_log('object-cache: Composer autoload not found at: ' . $composer);
+			return;
+		}
+
+		require_once $composer;
+		add_action('admin_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
+		add_action('wp_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
+
+		add_action('wp_ajax_wpoven_flush_object_cache', [$this, 'flush_object_cache_handler']);
+		add_action('wp_ajax_nopriv_wpoven_flush_object_cache', [$this, 'flush_object_cache_handler']);
+
+		add_action('wp_ajax_wpoven_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
+		add_action('wp_ajax_nopriv_wpoven_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
+
+		add_action('admin_bar_menu', [$this, 'wpoven_add_single_cache_clear_button'], 101);
+
+		add_action('admin_post_wpoven_clear_object_cache', [$this, 'clear_object_cache_handler']);
+		add_action('admin_post_wpoven_clear_varnish_cache', [$this, 'clear_varnish_cache_handler']);
 	}
+
+	function flush_varnish_cache_handler()
+	{
+		check_ajax_referer('wpoven_ajax_nonce', 'security');
+
+		$return_array = array();
+		$this->_wpoven_triple_cache->_clear_varnish_cache();
+
+		$return_array['status'] = 'success';
+		$return_array['message'] = __('Varnish cache flushed successfully.', 'wpoven-triple-cache');
+
+		die(wp_json_encode($return_array));
+	}
+
+	function clear_object_cache_handler()
+	{
+		global $wp_object_cache;
+		$result = $wp_object_cache->flush();
+		wp_safe_redirect(wp_get_referer());
+		exit;
+	}
+
+	function clear_varnish_cache_handler()
+	{
+		$this->_wpoven_triple_cache->_clear_varnish_cache();
+		wp_safe_redirect(wp_get_referer());
+		exit;
+	}
+
 
 	/**
 	 * Register the stylesheets for the admin area.
@@ -139,6 +194,21 @@ class Wpoven_Triple_Cache_Admin
 		require_once WPOCF_PLUGIN_PATH . 'libs/cloudflare.class.php';
 		require_once WPOCF_PLUGIN_PATH . 'libs/cache_controller.class.php';
 		require_once WPOCF_PLUGIN_PATH . 'libs/backend.class.php';
+		require_once WPOCF_PLUGIN_PATH . 'libs/js-optimizer.class.php';
+
+		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$js_optimizer = new WPOCF_JS_Optimizer($options);
+		if (isset($options['jsopt_defer']) || isset($options['jsopt_delay']) || isset($options['lazyload_images'])) {
+			if ($options['jsopt_defer'] || $options['jsopt_delay'] || $options['lazyload_images']) {
+				ob_start([$js_optimizer, 'optimize_output']);
+			}
+		}
+
+		add_action('shutdown', function () {
+			while (ob_get_level() > 0) {
+				@ob_end_flush();
+			}
+		});
 
 		$this->objects = apply_filters('wpocf_include_libs_early', $this->objects);
 
@@ -156,6 +226,87 @@ class Wpoven_Triple_Cache_Admin
 		$this->objects = apply_filters('wpocf_include_libs_lately', $this->objects);
 		$this->enable_wp_cli_support();
 	}
+
+
+
+	function add_ajax_nonce_to_admin_footer()
+	{
+?>
+		<script type="text/javascript">
+			var ajax_nonce = '<?php echo esc_html(wp_create_nonce('wpoven_ajax_nonce')); ?>';
+			var ajax_url = '<?php echo esc_html(admin_url('admin-ajax.php')); ?>';
+			document.write('<div id="wpoven-ajax-nonce" style="display:none;">' + ajax_nonce + '</div>');
+			document.write('<div id="wpoven-ajax-url" style="display:none;">' + ajax_url + '</div>');
+		</script>
+<?php
+	}
+
+	function flush_object_cache_handler()
+	{
+		check_ajax_referer('wpoven_ajax_nonce', 'security');
+
+		$return_array = array();
+		global $wp_object_cache;
+		$result = $wp_object_cache->flush();
+		if ($result) {
+			$return_array['status'] = 'success';
+			$return_array['message'] = __('Object cache flushed successfully.', 'wpoven-triple-cache');
+		} else {
+			$return_array['status'] = 'error';
+			$return_array['message'] = __('Failed to flush object cache.', 'wpoven-triple-cache');
+		}
+
+		die(wp_json_encode($return_array));
+	}
+
+	function wpoven_add_single_cache_clear_button($wp_admin_bar)
+	{
+		if (!is_user_logged_in()) return;
+
+		// Toolbar button
+		// Main Title in Toolbar
+		$wp_admin_bar->add_node([
+			'id'    => 'wpoven_cache_main',
+			'title' => '🧹 Triple Cache',
+			'href'  => false, // Clicking does nothing
+			'meta'  => [
+				'class' => 'wpoven-cache-toolbar-title',
+			]
+		]);
+
+		// Sub-item: Clear Object Cache
+		$wp_admin_bar->add_node([
+			'id'     => 'wpoven_clear_object_cache',
+			'parent' => 'wpoven_cache_main',
+			'title'  => 'Clear Object Cache',
+			'href'   => wp_nonce_url(
+				admin_url('admin-post.php?action=wpoven_clear_object_cache'),
+				'wpoven_clear_cache'
+			),
+		]);
+
+		$wp_admin_bar->add_node([
+			'id'     => 'wpoven_clear_varnish_cache',
+			'parent' => 'wpoven_cache_main',
+			'title'  => 'Clear Varnish Cache',
+			'href'   => wp_nonce_url(
+				admin_url('admin-post.php?action=wpoven_clear_varnish_cache'),
+				'wpoven_clear_cache'
+			),
+		]);
+
+		// Sub-item: Clear Redis Cache
+		// $wp_admin_bar->add_node([
+		// 	'id'     => 'wpoven_clear_cf_cache',
+		// 	'parent' => 'wpoven_cache_main',
+		// 	'title'  => 'Clear Cloudflare Cache',
+		// 	'href'   => wp_nonce_url(
+		// 		admin_url('admin-post.php?action=wpoven_clear_redis_cache'),
+		// 		'wpoven_clear_cache'
+		// 	),
+		// ]);
+	}
+
 
 	function get_default_config()
 	{
@@ -1104,6 +1255,308 @@ class Wpoven_Triple_Cache_Admin
 		return $result;
 	}
 
+	private function connect_fs()
+	{
+		global $wp_filesystem;
+
+		require_once(ABSPATH . '/wp-admin/includes/file.php');
+		require_once(ABSPATH . '/wp-admin/includes/misc.php');
+
+		// Attempt to initialize WP Filesystem API
+		$creds = request_filesystem_credentials('', '', false, false, array());
+		if (!WP_Filesystem($creds)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	function is_redis_running()
+	{
+		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+
+		$host     = isset($options['redis_host']) ? $options['redis_host'] : '127.0.0.1';
+		$port     = isset($options['redis_port']) ? (int) $options['redis_port'] : 6379;
+		$password = isset($options['redis_password']) ? $options['redis_password'] : '';
+		$database = isset($options['redis_database']) ? (int) $options['redis_database'] : 0;
+		$redisTimeout = 1; // 1 second timeout for connection
+
+		// phpFastCache Redis config
+		$redisConfig = new RedisConfig([
+			'host'     => $host,
+			'port'     => $port,
+			'password' => $password,
+			'database' => $database,
+			'timeout'  => $redisTimeout,
+		]);
+
+		try {
+			// Create instance
+			$instance = CacheManager::getInstance('redis', $redisConfig);
+			return true;
+		} catch (Throwable $e) {
+			error_log("Redis check failed: " . $e->getMessage());
+
+			return false;
+		}
+
+		return false;
+	}
+
+	function is_redis_enable()
+	{
+		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$redis_enable = isset($options['redis_enable']) ? $options['redis_enable'] : false;
+		$file_enable = isset($options['file_enable']) ? $options['file_enable'] : false;
+		if ($redis_enable || $file_enable) {
+			if (!file_exists(WP_CONTENT_DIR . '/object-cache.php')) {
+
+				if ($this->connect_fs()) {
+					global $wp_filesystem;
+					$wp_filesystem->copy(
+						plugin_dir_path(dirname(__FILE__)) . 'libs/object-cache.php',
+						WP_CONTENT_DIR . '/object-cache.php',
+						true
+					);
+				}
+			}
+		} else {
+
+			if (file_exists(WP_CONTENT_DIR . '/object-cache.php')) {
+
+				if ($this->connect_fs()) {
+					global $wp_filesystem;
+					$wp_filesystem->delete(WP_CONTENT_DIR . '/object-cache.php');
+				}
+			}
+		}
+		return true;
+	}
+
+	/* -------------------------------------------------
+	* REDIS OBJECT CACHE
+	* ------------------------------------------------- */
+
+	protected function object_cache_settings()
+	{
+		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$redis_enable = isset($options['redis_enable']) ? $options['redis_enable'] : false;
+		$file_enable = isset($options['file_enable']) ? $options['file_enable'] : false;
+		$result = array();
+		$redis_running = $this->is_redis_running();
+
+
+		if (!$redis_running) {
+
+			$result[] = array(
+				'id'    => 'redis_not_running_info',
+				'type'  => 'info',
+				'style' => 'critical',
+				'desc'  => esc_html__('Redis server is not detected or not running.', 'wpoven-triple-cache'),
+			);
+		} else {
+
+			$result[] = array(
+				'id'    => 'redis_enable',
+				'type'  => 'switch',
+				'title' => esc_html__('Redis Object Cache', 'wpoven-triple-cache'),
+				'desc'  => esc_html__('Enable for Redis-based WordPress object caching.', 'wpoven-triple-cache'),
+				'subtitle' => '<button type="button" style="color:green;">Redis server running</button>',
+				'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
+				'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+				'default' => false,
+			);
+		}
+
+		$result[] = array(
+			'id'    => 'file_enable',
+			'type'  => 'switch',
+			'title' => esc_html__('File Object Cache', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Enable for File-based WordPress object caching.', 'wpoven-triple-cache'),
+			'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
+			'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+			'default' => false,
+		);
+
+		$result[] = array(
+			'id'    => 'redis_host',
+			'type'  => 'text',
+			'title' => esc_html__('Redis Host', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Enter your Redis server hostname or IP address. Default is localhost (127.0.0.1).', 'wpoven-triple-cache'),
+			'default' => '127.0.0.1',
+		);
+
+		$result[] = array(
+			'id'    => 'redis_port',
+			'type'  => 'text',
+			'title' => esc_html__('Redis Port', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Default Redis port is 6379. Change only if your server uses a custom port.', 'wpoven-triple-cache'),
+			'default' => '6379',
+		);
+
+		$result[] = array(
+			'id'    => 'redis_password',
+			'type'  => 'text',
+			'title' => esc_html__('Redis Password', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Enter Redis authentication password only if Redis requires AUTH. Leave blank if not configured.', 'wpoven-triple-cache'),
+			'default' => '',
+		);
+
+		$result[] = array(
+			'id'    => 'redis_database',
+			'type'  => 'spinner',
+			'title' => esc_html__('Redis Database Index', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Select the Redis database number (0–100). Using a separate DB ensures clean cache storage.', 'wpoven-triple-cache'),
+			'default' => 0,
+			'min' => 0,
+			'max' => 100,
+			'step' => 1,
+		);
+
+		if (($redis_enable && $redis_running) || $file_enable) {
+
+			$this->is_redis_enable();
+
+			$flush_cache_button = '<button 
+						type="button" 
+						class="cache-controller button-primary csf-warning-prinmary" 
+						style="width:160px; margin-right:10px; text-align:center;" 
+						id="wpocf_redis_flush"
+					>
+						CLEAR OBJECT CACHE
+					</button>';
+		} else {
+			$this->is_redis_enable();
+			$flush_cache_button = null;
+		}
+
+		if ($flush_cache_button) {
+
+			$result[] = array(
+				'id'      => 'redis_flush',
+				'type'    => 'raw',
+				'title'   => esc_html__(' ', 'wpoven-triple-cache'),
+				'content' => $flush_cache_button,
+			);
+		}
+
+		return $result;
+	}
+
+
+	function varnish_cache_settings()
+	{
+		$result = array();
+
+		$result[] = array(
+			'id'    => 'varnish_cache_enable',
+			'type'  => 'switch',
+			'title' => esc_html__('Varnish Cache', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Enable to purge Varnish cache when content is updated.', 'wpoven-triple-cache'),
+			'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
+			'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+			'default' => true,
+		);
+
+		$varnish_cache_button = '<button 
+					type="button" 
+					class="varnish-cache-controller button-primary csf-warning-prinmary" 
+					style="width:170px; margin-right:10px; text-align:center;" 
+					id="varnish_cache_flush"
+				>
+					CLEAR VARNISH CACHE
+				</button>';
+
+		$result[] = array(
+			'id'      => 'varnish_flush',
+			'type'    => 'raw',
+			'title'   => esc_html__(' ', 'wpoven-triple-cache'),
+			'content' => $varnish_cache_button,
+		);
+
+		return $result;
+	}
+
+	/* -------------------------------------------------
+	* JAVASCRIPT OPTIMIZATION
+	* ------------------------------------------------- */
+
+	function js_optimization_settings()
+	{
+
+		$result = array();
+
+		$result[] = array(
+			'id'    => 'jsopt_defer',
+			'type'  => 'switch',
+			'title' => esc_html__('Defer JavaScript', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Add the defer attribute to external JS files to speed up initial rendering.', 'wpoven-triple-cache'),
+			'default' => false,
+		);
+
+		$result[] = array(
+			'id'    => 'jsopt_delay',
+			'type'  => 'switch',
+			'title' => esc_html__('Delay JavaScript Execution', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Delay non-critical JS until the user interacts with the page (scroll, click, move).', 'wpoven-triple-cache'),
+			'default' => false,
+		);
+
+		$result[] = array(
+			'id'    => 'jsopt_exclude_patterns',
+			'type'  => 'textarea',
+			'title' => esc_html__('Exclude JS Files / Patterns', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Add keywords or filenames (one per line) for scripts that should NOT be deferred or delayed.', 'wpoven-triple-cache'),
+			'default' => '',
+		);
+
+		$result[] = array(
+			'id'    => 'jsopt_safe_mode',
+			'type'  => 'switch',
+			'title' => esc_html__('Safe Mode for JS Optimization', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Prevents optimization from breaking inline JavaScript and essential scripts.', 'wpoven-triple-cache'),
+			'default' => false,
+		);
+
+		return $result;
+	}
+
+	/* -------------------------------------------------
+	* LAZY LOAD SETTINGS
+	* ------------------------------------------------- */
+
+	function lazyload_settings()
+	{
+		$result = array();
+
+		$result[] = array(
+			'id'    => 'lazyload_images',
+			'type'  => 'switch',
+			'title' => esc_html__('Lazy Load Iframes/Videos', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Apply lazy loading to YouTube videos, embeds, and iframe content.', 'wpoven-triple-cache'),
+			'default' => false,
+		);
+
+		$result[] = array(
+			'id'    => 'lazyload_exclude_classes',
+			'type'  => 'textarea',
+			'title' => esc_html__('Exclude Classes from Lazy Load', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Add CSS Classes (one per line) for images or elements that should NOT be lazy-loaded.', 'wpoven-triple-cache'),
+			'default' => '',
+		);
+
+		$result[] = array(
+			'id'    => 'lazyload_exclude_selectors',
+			'type'  => 'textarea',
+			'title' => esc_html__('Exclude Selectors from Lazy Load', 'wpoven-triple-cache'),
+			'desc'  => esc_html__('Add CSS selectors (one per line) for images or elements that should NOT be lazy-loaded.', 'wpoven-triple-cache'),
+			'default' => '',
+		);
+
+		return $result;
+	}
+
+
 	/**
 	 * Set WPOven Triple Cache admin page.
 	 */
@@ -1135,6 +1588,7 @@ class Wpoven_Triple_Cache_Admin
 			'customizer'                => false,
 			'open_expanded'             => false,
 			'disable_save_warn'         => false,
+			'save_action'               => 'refresh',
 			'page_priority'             => 90,
 			'page_parent'               => 'themes.php',
 			'page_permissions'          => 'manage_options',
@@ -1167,7 +1621,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Cloudflare Settings', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Cloudflare Edge Cache', 'WPOven Triple Cache'),
 				'id'         => 'general',
 				'subsection' => false,
 				'icon'       => 'el el-cloud',
@@ -1175,6 +1629,55 @@ class Wpoven_Triple_Cache_Admin
 				'fields'     => $this->cf_general_settings(),
 			)
 		);
+
+		Redux::set_section(
+			$opt_name,
+			array(
+				'title'      => esc_html__('Object Cache (Redis)', 'WPOven Triple Cache'),
+				'id'         => 'object-cache',
+				'subsection' => false,
+				'icon'       => 'fa-solid fa-cubes',
+				'heading'    => 'OBJECT CACHE SETTINGS',
+				'fields'     => $this->object_cache_settings(),
+			)
+		);
+
+		Redux::set_section(
+			$opt_name,
+			array(
+				'title'      => esc_html__('Varnish Cache', 'WPOven Triple Cache'),
+				'id'         => 'varnish-cache',
+				'subsection' => false,
+				'icon'       => 'fa-solid fa-shield-halved',
+				'heading'    => 'VARNISH CACHE SETTINGS',
+				'fields'     => $this->varnish_cache_settings(),
+			)
+		);
+
+		Redux::set_section(
+			$opt_name,
+			array(
+				'title'      => esc_html__('JavaScript Optimization', 'WPOven Triple Cache'),
+				'id'         => 'js-optimization',
+				'subsection' => false,
+				'icon'       => 'fa-solid fa-code',
+				'heading'    => 'JAVASCRIPT OPTIMIZATION SETTINGS',
+				'fields'     => $this->js_optimization_settings(),
+			)
+		);
+
+		Redux::set_section(
+			$opt_name,
+			array(
+				'title'      => esc_html__('Lazy Load', 'WPOven Triple Cache'),
+				'id'         => 'lazyload',
+				'subsection' => false,
+				'icon'       => 'fa-solid fa-image',
+				'heading'    => 'LAZY LOAD SETTINGS',
+				'fields'     => $this->lazyload_settings(),
+			)
+		);
+
 		Redux::set_section(
 			$opt_name,
 			array(
@@ -1183,7 +1686,7 @@ class Wpoven_Triple_Cache_Admin
 				'subsection' => false,
 				'heading'    => 'CACHE LIFETIME SETTINGS',
 				'fields'     => $this->cf_cache_settings(),
-				'icon'       => 'fa-solid fa-database'
+				'icon'       => 'fa-solid fa-gear',
 			)
 		);
 	}

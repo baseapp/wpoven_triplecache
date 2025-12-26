@@ -27,7 +27,8 @@
  * @subpackage Wpoven_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache {
+class Wpoven_Triple_Cache
+{
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -57,6 +58,7 @@ class Wpoven_Triple_Cache {
 	 */
 	protected $version;
 	protected $options;
+	private $_cleared_varnish_cache_full = false;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -67,8 +69,9 @@ class Wpoven_Triple_Cache {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		if ( defined( 'WPOVEN_TRIPLE_CACHE_VERSION' ) ) {
+	public function __construct()
+	{
+		if (defined('WPOVEN_TRIPLE_CACHE_VERSION')) {
 			$this->version = WPOVEN_TRIPLE_CACHE_VERSION;
 		} else {
 			$this->version = '1.0.0';
@@ -79,7 +82,6 @@ class Wpoven_Triple_Cache {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -98,33 +100,33 @@ class Wpoven_Triple_Cache {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies()
+	{
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wpoven-triple-cache-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wpoven-triple-cache-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wpoven-triple-cache-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wpoven-triple-cache-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wpoven-triple-cache-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-wpoven-triple-cache-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-wpoven-triple-cache-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-wpoven-triple-cache-public.php';
 
 		$this->loader = new Wpoven_Triple_Cache_Loader();
-
 	}
 
 	/**
@@ -136,12 +138,12 @@ class Wpoven_Triple_Cache {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale()
+	{
 
 		$plugin_i18n = new Wpoven_Triple_Cache_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
 
 	/**
@@ -151,12 +153,13 @@ class Wpoven_Triple_Cache {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks()
+	{
 
-		$plugin_admin = new Wpoven_Triple_Cache_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wpoven_Triple_Cache_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 		$plugin_admin->admin_main($this);
 	}
 
@@ -167,13 +170,13 @@ class Wpoven_Triple_Cache {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks()
+	{
 
-		$plugin_public = new Wpoven_Triple_Cache_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Wpoven_Triple_Cache_Public($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 	}
 
 	/**
@@ -181,7 +184,14 @@ class Wpoven_Triple_Cache {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run()
+	{
+
+		// Load the settings
+		$this->options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		// Setup Caching setup 
+		$this->_detect_content_change();
+
 		$this->loader->run();
 	}
 
@@ -192,7 +202,8 @@ class Wpoven_Triple_Cache {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name()
+	{
 		return $this->plugin_name;
 	}
 
@@ -202,7 +213,8 @@ class Wpoven_Triple_Cache {
 	 * @since     1.0.0
 	 * @return    Wpoven_Triple_Cache_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader()
+	{
 		return $this->loader;
 	}
 
@@ -212,8 +224,51 @@ class Wpoven_Triple_Cache {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version()
+	{
 		return $this->version;
 	}
 
+
+	// Cleared on all updates 
+
+	public function _clear_varnish_cache()
+	{
+		$urlParts = parse_url(get_bloginfo('wpurl'));
+
+		$response = wp_remote_request("http://127.0.0.1", array('method' => 'PURGE', 'headers' => array('Host' => $urlParts['host'])));
+	}
+
+
+
+	public function _process_flush_cache()
+	{
+		// clear varnish cache is set ? 
+		if (isset($this->options['varnish_cache_enable']) && $this->options['varnish_cache_enable'] && !$this->_cleared_varnish_cache_full) {
+			// Request the local vanish setup to urge all cache ( All Cache ) 
+			// Do only once
+			$this->_clear_varnish_cache();
+			$this->_cleared_varnish_cache_full = true;
+		}
+	}
+
+	private function _detect_content_change()
+	{
+		add_action('switch_theme', array($this, '_process_flush_cache'));
+		add_action('publish_phone', array($this, '_process_flush_cache'));
+		add_action('publish_post', array($this, '_process_flush_cache'));
+		add_action('edit_post', array($this, '_process_flush_cache'));
+		add_action('save_post', array($this, '_process_flush_cache'));
+		add_action('wp_trash_post', array($this, '_process_flush_cache'));
+		add_action('delete_post', array($this, '_process_flush_cache'));
+		add_action('trackback_post', array($this, '_process_flush_cache'));
+		add_action('pingback_post', array($this, '_process_flush_cache'));
+		add_action('comment_post', array($this, '_process_flush_cache'));
+		add_action('edit_comment', array($this, '_process_flush_cache'));
+		add_action('wp_set_comment_status', array($this, '_process_flush_cache'));
+		add_action('delete_comment', array($this, '_process_flush_cache'));
+		add_action('comment_cookie_lifetime', array($this, '_process_flush_cache'));
+		add_action('wp_update_nav_menu', array($this, '_process_flush_cache'));
+		add_action('edit_user_profile_update', array($this, '_process_flush_cache'));
+	}
 }
