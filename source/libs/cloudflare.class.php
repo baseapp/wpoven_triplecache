@@ -359,7 +359,7 @@ class WPOCF_Cloudflare
                         'target' => 'url',
                         'constraint' => array(
                             'operator' => 'matches',
-                            'value' =>  'test.devscript.cloud' //$url
+                            'value' =>  $url
                         ),
                     )
                 ),
@@ -688,7 +688,7 @@ class WPOCF_Cloudflare
             return false;
         }
 
-        if (!isset($headers['CF-Cache-Status'])) {
+        if (!isset($headers['Cf-Cache-Status'])) {
             return false;
         }
 
@@ -712,23 +712,23 @@ class WPOCF_Cloudflare
             return true;
         }
 
-        if (strcasecmp($headers['CF-Cache-Status'], 'HIT') == 0 || strcasecmp($headers['CF-Cache-Status'], 'MISS') == 0 || strcasecmp($headers['CF-Cache-Status'], 'EXPIRED') == 0) {
+        if (strcasecmp($headers['Cf-Cache-Status'], 'HIT') == 0 || strcasecmp($headers['Cf-Cache-Status'], 'MISS') == 0 || strcasecmp($headers['Cf-Cache-Status'], 'EXPIRED') == 0) {
             return true;
         }
 
-        if (strcasecmp($headers['CF-Cache-Status'], 'REVALIDATED') == 0) {
+        if (strcasecmp($headers['Cf-Cache-Status'], 'REVALIDATED') == 0) {
             return false;
         }
 
-        if (strcasecmp($headers['CF-Cache-Status'], 'UPDATING') == 0) {
+        if (strcasecmp($headers['Cf-Cache-Status'], 'UPDATING') == 0) {
             return false;
         }
 
-        if (strcasecmp($headers['CF-Cache-Status'], 'BYPASS') == 0) {
+        if (strcasecmp($headers['Cf-Cache-Status'], 'BYPASS') == 0) {
             return false;
         }
 
-        if (strcasecmp($headers['CF-Cache-Status'], 'DYNAMIC') == 0) {
+        if (strcasecmp($headers['Cf-Cache-Status'], 'DYNAMIC') == 0) {
             $cookies = wp_remote_retrieve_cookies($response);
             return false;
         }

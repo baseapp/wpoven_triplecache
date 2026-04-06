@@ -17,7 +17,6 @@ class WPOCF_JS_Optimizer
 
     public function optimize_output($html)
     {
-        print_r('optimize_output called');
         // Skip optimization for admin area
         if (is_admin()) {
             return $html;

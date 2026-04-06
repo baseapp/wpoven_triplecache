@@ -1039,7 +1039,7 @@ class Wpoven_Triple_Cache_Admin
 			'type'    => 'info',
 			'desc'    => '<div>
 							<h2>Enter your Cloudflare API key and e-mail</h2>
-							<p>You do not know how to do it? Follow these simple four steps:</p>
+							<p>You do not know how to do it? Follow these simple 5 steps:</p>
 							<ol>
 								<li><a href="https://dash.cloudflare.com/login" target="_blank">Sign in to your Cloudflare account </a> and select My Profile.</li>
 								<li>Navigate to API tokens, scroll to API Keys, and click View next to Global API Key.</li>

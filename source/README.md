@@ -1,5 +1,7 @@
 # WPOven Triple Cache
 
+![PHP Check Status](https://github.com/baseapp/wpoven_triplecache/actions/workflows/action.yml/badge.svg)
+
 **Contributors:** [WPOven](https://www.wpoven.com/)  
 **Requires at least:** 6.2 
 **Tested up to:** 6.9  
@@ -63,11 +65,18 @@ Yes. This is the main purpose of this plugin.
 
 ## Changelog
 
+### 1.0.1
+- Added Redis Object Cache integration to improve database query performance.
+- Introdued File-based Caching for faster page load times.
+- Added Varnish Cache support with automatic cache purge on content updates.
+- Added JavaScript Optimization (minification and deferred loading).
+- Implemented Lazy Load for images to reduce initial page load time.
+
 ### 1.0.0
 - Initial release.
 - Integrated Cloudflare for advanced caching and security.
 
 ## Upgrade Notice
 
-### 1.0.0
-Upgrade to this version for improved caching performance and compatibility with the latest WordPress updates.
+### 1.0.1 
+Introduces Redis Object Cache, file caching, Varnish cache integration, JavaScript optimization, and lazy loading. Server-side configuration may be required for Redis and Varnish. Recommended upgrade for improved performance.
