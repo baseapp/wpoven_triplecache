@@ -76,16 +76,20 @@ if (!defined('WPOCF_HOME_PAGE_SHOWS_POSTS'))
 	define('WPOCF_HOME_PAGE_SHOWS_POSTS', true);
 
 
+// === UPDATER START ===
+
 require_once plugin_dir_path(__FILE__) . 'includes/libraries/plugin-update-checker/plugin-update-checker.php';
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $wpoven_triple_cache_update_checker = PucFactory::buildUpdateChecker(
-	'https://github.com/baseapp/wpoven_triplecache/',
+	'https://github.com/baseapp/wpoven_triplecache',
 	__FILE__,
 	'wpoven-triple-cache'
 );
 $wpoven_triple_cache_update_checker->getVcsApi()->enableReleaseAssets();
+
+// === UPDATER END ===
 
 
 /**

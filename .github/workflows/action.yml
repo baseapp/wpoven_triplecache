@@ -115,8 +115,7 @@ jobs:
       - name: Strip updater for plugin check
         run: |
           sudo rm -rf $PLUGIN_PATH/includes/libraries/plugin-update-checker
-          sudo sed -i '/YahnisElsts/d' $PLUGIN_PATH/wpoven-triple-cache.php
-          sudo sed -i '/PucFactory/d' $PLUGIN_PATH/wpoven-triple-cache.php
+          sudo sed -i '/UPDATER START/,/UPDATER END/d' $PLUGIN_PATH/wpoven-triple-cache.php
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@v1
