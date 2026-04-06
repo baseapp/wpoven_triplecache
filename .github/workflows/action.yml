@@ -112,6 +112,12 @@ jobs:
           wp plugin verify-checksums wpoven_triplecache
           echo "status=success" >> $GITHUB_OUTPUT
 
+      - name: Strip updater for plugin check
+        run: |
+          rm -rf $PLUGIN_PATH/includes/libraries/plugin-update-checker
+          sed -i '/YahnisElsts/d' $PLUGIN_PATH/wpoven-triple-cache.php
+          sed -i '/PucFactory/d' $PLUGIN_PATH/wpoven-triple-cache.php
+
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@v1
         with:
