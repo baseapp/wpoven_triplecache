@@ -1,5 +1,7 @@
 <?php
 
+if (! defined('ABSPATH')) exit;
+
 /**
  * The file that defines the core plugin class
  *
@@ -234,7 +236,7 @@ class Wpoven_Triple_Cache
 
 	public function _clear_varnish_cache()
 	{
-		$urlParts = parse_url(get_bloginfo('wpurl'));
+		$urlParts = wp_parse_url(get_bloginfo('wpurl'));
 
 		$response = wp_remote_request("http://127.0.0.1", array('method' => 'PURGE', 'headers' => array('Host' => $urlParts['host'])));
 	}
