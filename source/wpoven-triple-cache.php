@@ -35,6 +35,8 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
+
+define('WPORG_PLUGIN', false);
 define('WPOVEN_TRIPLE_CACHE_VERSION', '1.0.1');
 if (!defined('WPOVEN_TRIPLE_CACHE_SLUG'))
 	define('WPOVEN_TRIPLE_CACHE_SLUG', 'wpoven-triple-cache');
@@ -78,12 +80,15 @@ require_once plugin_dir_path(__FILE__) . 'includes/libraries/plugin-update-check
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
-$wpoven_triple_cache_update_checker = PucFactory::buildUpdateChecker(
-	'https://github.com/baseapp/wpoven_triplecache/',
-	__FILE__,
-	'wpoven-triple-cache'
-);
-$wpoven_triple_cache_update_checker->getVcsApi()->enableReleaseAssets();
+if (!defined('WPORG_PLUGIN')) {
+
+	$wpoven_triple_cache_update_checker = PucFactory::buildUpdateChecker(
+		'https://github.com/baseapp/wpoven_triplecache/',
+		__FILE__,
+		'wpoven-triple-cache'
+	);
+	$wpoven_triple_cache_update_checker->getVcsApi()->enableReleaseAssets();
+}
 
 /**
  * The code that runs during plugin activation.
