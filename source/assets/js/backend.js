@@ -278,31 +278,44 @@ function wpocf_update_toolbar_cache_status() {
 }
 
 document.addEventListener("DOMContentLoaded", function (event) {
+  // Plugin specifically checks for its own buttons instead of globally preventing default on all .button-primary elements
   var buttons = document.querySelectorAll(".button-primary");
 
   buttons.forEach(function (button) {
     button.addEventListener("click", function (event) {
-      event.preventDefault();
       var buttonId = this.getAttribute("id");
-      if (buttonId === "wpocf_submit_enable_page_cache") {
-        wpocf_enable_page_cache();
-      }
-      if (buttonId === "wpocf_submit_disable_page_cache") {
-        wpocf_disable_page_cache();
-      }
-      if (buttonId === "wpocf_submit_purge_cache") {
-        wpocf_purge_whole_cache();
-      }
-      if (buttonId === "wpocf_submit_test_cache") {
-        wpocf_test_page_cache();
-      }
-      if (buttonId === "wpocf_submit_reset_all") {
-        if (confirm("Are you sure you want reset all?")) {
-          wpocf_reset_all();
+      var validIds = [
+        "wpocf_submit_enable_page_cache",
+        "wpocf_submit_disable_page_cache",
+        "wpocf_submit_purge_cache",
+        "wpocf_submit_test_cache",
+        "wpocf_submit_reset_all"
+      ];
+
+      if (validIds.includes(buttonId)) {
+        event.preventDefault();
+
+        if (buttonId === "wpocf_submit_enable_page_cache") {
+          wpocf_enable_page_cache();
+        }
+        if (buttonId === "wpocf_submit_disable_page_cache") {
+          wpocf_disable_page_cache();
+        }
+        if (buttonId === "wpocf_submit_purge_cache") {
+          wpocf_purge_whole_cache();
+        }
+        if (buttonId === "wpocf_submit_test_cache") {
+          wpocf_test_page_cache();
+        }
+        if (buttonId === "wpocf_submit_reset_all") {
+          if (confirm("Are you sure you want reset all?")) {
+            wpocf_reset_all();
+          }
         }
       }
     });
   });
+
 
   if (document.querySelector(".wpocf_action_row_single_post_cache_purge")) {
     document

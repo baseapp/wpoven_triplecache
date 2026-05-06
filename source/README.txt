@@ -2,7 +2,7 @@
 Contributors: https://www.wpoven.com/
 Requires at least: 6.2
 Tested up to: 6.9
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,9 +61,12 @@ Yes. This is the main purpose of this plugin.
 
 == Changelog ==
 
+= 1.0.2 =
+* Fixing a bug where the admin cannot delete WordPress users after activating the plugin.
+
 = 1.0.1 =
 * Added Redis Object Cache integration to improve database query performance.
-* Introdued File-based Caching for faster page load times.
+* Introduced File-based Caching for faster page load times.
 * Added Varnish Cache support with automatic cache purge on content updates.
 * Added JavaScript Optimization (minification and deferred loading).
 * Implemented Lazy Load for images to reduce initial page load time.
@@ -74,5 +77,5 @@ Yes. This is the main purpose of this plugin.
 
 == Upgrade Notice ==
 
-= 1.0.1 =
-Introduces Redis Object Cache, file caching, Varnish cache integration, JavaScript optimization, and lazy loading. Server-side configuration may be required for Redis and Varnish. Recommended upgrade for improved performance.
+= 1.0.2 =
+Fixes an issue where the admin could not delete WordPress users after activating the plugin. Includes minor bug fixes and performance improvements.

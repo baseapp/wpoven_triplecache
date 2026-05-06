@@ -16,7 +16,7 @@
  * Plugin Name:       WPOven Triple Cache
  * Plugin URI:        https://www.wpoven.com/plugins/wpoven-triple-cache
  * Description:       Cloudflare Caching
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            WPOven
  * Author URI:        https://www.wpoven.com/
  * License:           GPL-2.0+
@@ -37,7 +37,7 @@ if (!defined('WPINC')) {
  */
 
 
-define('WPOVEN_TRIPLE_CACHE_VERSION', '1.0.1');
+define('WPOVEN_TRIPLE_CACHE_VERSION', '1.0.2');
 if (!defined('WPOVEN_TRIPLE_CACHE_SLUG'))
 	define('WPOVEN_TRIPLE_CACHE_SLUG', 'wpoven-triple-cache');
 
