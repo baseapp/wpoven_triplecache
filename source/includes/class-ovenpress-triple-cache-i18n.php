@@ -9,8 +9,8 @@
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache_i18n
+class Ovenpress_Triple_Cache_i18n
 {
 
 

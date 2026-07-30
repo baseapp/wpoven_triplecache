@@ -148,7 +148,7 @@ class WPOCF_Cache_Controller
 
         add_meta_box(
             'wpocf_cache_mbox',
-            __('Cloudflare Page Cache Settings', 'WPOven Triple Cache'),
+            __('Cloudflare Page Cache Settings', 'OvenPress Triple Cache'),
             array($this, 'wpocf_cache_mbox_callback'),
             $allowed_post_types,
             'side'
@@ -163,10 +163,10 @@ class WPOCF_Cache_Controller
 
 ?>
 
-        <label for="wpocf_bypass_cache"><?php _e('Bypass the cache for this page', 'WPOven Triple Cache'); ?></label>
+        <label for="wpocf_bypass_cache"><?php _e('Bypass the cache for this page', 'OvenPress Triple Cache'); ?></label>
         <select name="wpocf_bypass_cache">
-            <option value="0" <?php if ($bypass_cache == 0) echo 'selected'; ?>><?php _e('No', 'WPOven Triple Cache'); ?></option>
-            <option value="1" <?php if ($bypass_cache == 1) echo 'selected'; ?>><?php _e('Yes', 'WPOven Triple Cache'); ?></option>
+            <option value="0" <?php if ($bypass_cache == 0) echo 'selected'; ?>><?php _e('No', 'OvenPress Triple Cache'); ?></option>
+            <option value="1" <?php if ($bypass_cache == 1) echo 'selected'; ?>><?php _e('Yes', 'OvenPress Triple Cache'); ?></option>
         </select>
 
     <?php
@@ -229,25 +229,25 @@ class WPOCF_Cache_Controller
     function setup_response_headers_filter($headers)
     {
 
-        if (!isset($headers['Wpoven-Cache'])) {
+        if (!isset($headers['Ovenpress-Cache'])) {
 
             $this->objects = $this->main_instance->get_objects();
 
             if (!$this->is_cache_enabled()) {
-                $headers['Wpoven-Cache'] = 'disabled';
+                $headers['Ovenpress-Cache'] = 'disabled';
             } else if ($this->is_url_to_bypass() || $this->can_i_bypass_cache()) {
                 $headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0';
-                $headers['Wpoven-Cache-Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0';
-                $headers['Wpoven-Cache'] = 'no-cache';
+                $headers['Ovenpress-Cache-Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0';
+                $headers['Ovenpress-Cache'] = 'no-cache';
                 $headers['Pragma'] = 'no-cache';
                 $headers['Expires'] = gmdate('D, d M Y H:i:s \G\M\T', time());
             } else {
 
 
                 $headers['Cache-Control'] = $this->get_cache_control_value(); // Used by Cloudflare
-                $headers['Wpoven-Cache-Cache-Control'] = $this->get_cache_control_value(); // Used by all
-                $headers['Wpoven-Cache-Active'] = '1'; // Used by CF worker
-                $headers['Wpoven-Cache'] = 'cache';
+                $headers['Ovenpress-Cache-Cache-Control'] = $this->get_cache_control_value(); // Used by all
+                $headers['Ovenpress-Cache-Active'] = '1'; // Used by CF worker
+                $headers['Ovenpress-Cache'] = 'cache';
             }
         }
 
@@ -265,15 +265,15 @@ class WPOCF_Cache_Controller
 
                 add_filter('nocache_headers', function () {
                     return array(
-                        'Wpoven-Cache' => 'disabled'
+                        'Ovenpress-Cache' => 'disabled'
                     );
                 }, PHP_INT_MAX);
             } else {
                 add_filter('nocache_headers', function () {
                     return array(
                         'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                        'Wpoven-Cache-Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                        'Wpoven-Cache' => 'no-cache',
+                        'Ovenpress-Cache-Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                        'Ovenpress-Cache' => 'no-cache',
                         'Pragma' => 'no-cache',
                         'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time())
                     );
@@ -286,7 +286,7 @@ class WPOCF_Cache_Controller
             add_filter('nocache_headers', function () {
 
                 return array(
-                    'Wpoven-Cache' => 'disabled'
+                    'Ovenpress-Cache' => 'disabled'
                 );
             }, PHP_INT_MAX);
         } else if ($this->is_url_to_bypass() || $this->can_i_bypass_cache()) {
@@ -294,8 +294,8 @@ class WPOCF_Cache_Controller
 
                 return array(
                     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                    'Wpoven-Cache-Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                    'Wpoven-Cache' => 'no-cache',
+                    'Ovenpress-Cache-Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                    'Ovenpress-Cache' => 'no-cache',
                     'Pragma' => 'no-cache',
                     'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time())
                 );
@@ -305,9 +305,9 @@ class WPOCF_Cache_Controller
 
                 return array(
                     'Cache-Control' => $this->get_cache_control_value(), // Used by Cloudflare
-                    'Wpoven-Cache-Cache-Control' => $this->get_cache_control_value(), // Used by all
-                    'Wpoven-Cache-Active' => '1', // Used by CF Worker
-                    'Wpoven-Cache' => 'cache'
+                    'Ovenpress-Cache-Cache-Control' => $this->get_cache_control_value(), // Used by all
+                    'Ovenpress-Cache-Active' => '1', // Used by CF Worker
+                    'Ovenpress-Cache' => 'cache'
                 );
             }, PHP_INT_MAX);
         }
@@ -322,7 +322,7 @@ class WPOCF_Cache_Controller
         $this->objects = $this->main_instance->get_objects();
 
         if (!$this->is_cache_enabled()) {
-            header('Wpoven-Cache: disabled');
+            header('Ovenpress-Cache: disabled');
             return;
         }
 
@@ -337,8 +337,8 @@ class WPOCF_Cache_Controller
             header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             header('Pragma: no-cache');
             header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()));
-            header('Wpoven-Cache: no-cache');
-            header('Wpoven-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Ovenpress-Cache: no-cache');
+            header('Ovenpress-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             $this->skip_cache = true;
             return;
         }
@@ -354,8 +354,8 @@ class WPOCF_Cache_Controller
         $this->objects = $this->main_instance->get_objects();
 
         if (!$this->is_cache_enabled()) {
-            header('Wpoven-Cache: disabled');
-            header('Wpoven-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Ovenpress-Cache: disabled');
+            header('Ovenpress-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             return;
         }
 
@@ -367,8 +367,8 @@ class WPOCF_Cache_Controller
             header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             header('Pragma: no-cache');
             header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time()));
-            header('Wpoven-Cache: no-cache');
-            header('Wpoven-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Ovenpress-Cache: no-cache');
+            header('Ovenpress-Cache-Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             return;
         }
 
@@ -380,9 +380,9 @@ class WPOCF_Cache_Controller
         header_remove('Expires');
         header_remove('Cache-Control');
         header('Cache-Control: ' . $this->get_cache_control_value());
-        header('Wpoven-Cache: cache');
-        header('Wpoven-Cache-Active: 1');
-        header('Wpoven-Cache-Cache-Control: ' . $this->get_cache_control_value());
+        header('Ovenpress-Cache: cache');
+        header('Ovenpress-Cache-Active: 1');
+        header('Ovenpress-Cache-Cache-Control: ' . $this->get_cache_control_value());
     }
 
 
@@ -707,11 +707,11 @@ class WPOCF_Cache_Controller
         if ($keep_settings == false) {
             $this->main_instance->set_config($this->main_instance->get_default_config());
             $this->main_instance->update_config();
-            update_option('wpoven-triple-cache', array());
+            update_option('ovenpress-triple-cache', array());
         } else {
             $this->main_instance->set_single_config('cf_cache_enabled', 0);
             $this->main_instance->update_config();
-            update_option('wpoven-triple-cache', array());
+            update_option('ovenpress-triple-cache', array());
         }
 
         // Delete all htaccess rules
@@ -1253,7 +1253,7 @@ class WPOCF_Cache_Controller
     {
 
         if (function_exists('insert_with_markers'))
-            insert_with_markers($this->htaccess_path, 'WPOven Triple Cache', array());
+            insert_with_markers($this->htaccess_path, 'OvenPress Triple Cache', array());
     }
 
     function write_htaccess(&$error_msg)
@@ -1265,22 +1265,22 @@ class WPOCF_Cache_Controller
         if ($this->main_instance->get_single_config('cf_cache_control_htaccess', 0) > 0 && $this->is_cache_enabled() && $this->main_instance->get_single_config('cf_worker_enabled', 0) == 0) {
 
             $htaccess_lines[] = '<IfModule mod_headers.c>';
-            $htaccess_lines[] = 'Header unset Pragma "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header always unset Pragma "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header unset Expires "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header always unset Expires "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header unset Cache-Control "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header always unset Cache-Control "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header always set Cache-Control "' . $this->get_cache_control_value() . '" "expr=resp(\'WPOven-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header unset Pragma "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header always unset Pragma "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header unset Expires "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header always unset Expires "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header unset Cache-Control "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header always unset Cache-Control "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header always set Cache-Control "' . $this->get_cache_control_value() . '" "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
 
-            $htaccess_lines[] = 'Header unset Pragma "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
-            $htaccess_lines[] = 'Header always unset Pragma "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
-            $htaccess_lines[] = 'Header unset Expires "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
-            $htaccess_lines[] = 'Header always unset Expires "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
-            $htaccess_lines[] = 'Header unset Cache-Coget_plugin_wp_content_directory_uriache-Control "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
+            $htaccess_lines[] = 'Header unset Pragma "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
+            $htaccess_lines[] = 'Header always unset Pragma "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
+            $htaccess_lines[] = 'Header unset Expires "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
+            $htaccess_lines[] = 'Header always unset Expires "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
+            $htaccess_lines[] = 'Header unset Cache-Control "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
 
-            // Add a cache-control header with the value of WPOven-cache-cache-control response header
-            $htaccess_lines[] = 'Header always set Cache-Control "expr=%{resp:WPOven-cache-cache-control}" "expr=resp(\'WPOven-cache-cache-control\') != \'\'"';
+            // Add a cache-control header with the value of OvenPress-cache-cache-control response header
+            $htaccess_lines[] = 'Header always set Cache-Control "expr=%{resp:OvenPress-cache-cache-control}" "expr=resp(\'OvenPress-cache-cache-control\') != \'\'"';
 
             $htaccess_lines[] = '</IfModule>';
         }
@@ -1288,8 +1288,8 @@ class WPOCF_Cache_Controller
         if ($this->main_instance->get_single_config('cf_strip_cookies', 0) > 0 && $this->is_cache_enabled()) {
 
             $htaccess_lines[] = '<IfModule mod_headers.c>';
-            $htaccess_lines[] = 'Header unset Set-Cookie "expr=resp(\'WPOven-cache-active\') == \'1\'"';
-            $htaccess_lines[] = 'Header always unset Set-Cookie "expr=resp(\'WPOven-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header unset Set-Cookie "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
+            $htaccess_lines[] = 'Header always unset Set-Cookie "expr=resp(\'OvenPress-cache-active\') == \'1\'"';
             $htaccess_lines[] = '</IfModule>';
         }
 
@@ -1358,8 +1358,8 @@ class WPOCF_Cache_Controller
         //     file_put_contents($this->main_instance->get_plugin_wp_content_directory() . '/nginx.conf', '');
         // }
 
-        // if( function_exists('insert_with_markers') && !insert_with_markers( $this->htaccess_path, 'WPOven Triple Cache', $htaccess_lines ) ) {
-        //     $error_msg = sprintf( __( 'The .htaccess file (%s) could not be edited. Check if the file has write permissions.', 'WPOven Triple Cache' ), $this->htaccess_path );
+        // if( function_exists('insert_with_markers') && !insert_with_markers( $this->htaccess_path, 'OvenPress Triple Cache', $htaccess_lines ) ) {
+        //     $error_msg = sprintf( __( 'The .htaccess file (%s) could not be edited. Check if the file has write permissions.', 'OvenPress Triple Cache' ), $this->htaccess_path );
         //     return false;
         // }
 
@@ -1377,13 +1377,13 @@ class WPOCF_Cache_Controller
 
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
         $this->purge_all(false, false, true);
 
-        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }
@@ -1399,13 +1399,13 @@ class WPOCF_Cache_Controller
 
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
         $this->purge_all(false, false);
 
-        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }
@@ -1424,7 +1424,7 @@ class WPOCF_Cache_Controller
 
         if (!$this->main_instance->can_current_user_purge_cache()) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
@@ -1434,10 +1434,10 @@ class WPOCF_Cache_Controller
 
         if (!$this->purge_urls($urls, false)) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('An error occurred while cleaning the cache. Please check log file for further details.', 'WPOven Triple Cache');
+            $return_array['error'] = __('An error occurred while cleaning the cache. Please check log file for further details.', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
-        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Cache purged successfully! It may take up to 30 seconds for the cache to be permanently cleaned by Cloudflare.', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }
@@ -1451,13 +1451,13 @@ class WPOCF_Cache_Controller
 
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
         $this->reset_all();
 
-        $return_array['success_msg'] = __('Cloudflare and all configurations have been reset to the initial settings.', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Cloudflare and all configurations have been reset to the initial settings.', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }
@@ -1557,7 +1557,7 @@ class WPOCF_Cache_Controller
 
         $schedules['wpocf_purge_cache_cron_interval'] = array(
             'interval' => (defined('wpocf_PURGE_CACHE_CRON_INTERVAL') && WPOCF_PURGE_CACHE_CRON_INTERVAL > 0) ? WPOCF_PURGE_CACHE_CRON_INTERVAL : 10,
-            'display'  => esc_html__('WPOven Triple Cache for Cloudflare - Purge Cache Cron Interval', 'WPOven Triple Cache')
+            'display'  => esc_html__('OvenPress Triple Cache for Cloudflare - Purge Cache Cron Interval', 'OvenPress Triple Cache')
         );
 
         return $schedules;
@@ -1680,7 +1680,7 @@ class WPOCF_Cache_Controller
 
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
@@ -1690,7 +1690,7 @@ class WPOCF_Cache_Controller
             die(wp_json_encode($return_array));
         }
 
-        $return_array['success_msg'] = __('Page cache enabled successfully', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Page cache enabled successfully', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }
@@ -1707,7 +1707,7 @@ class WPOCF_Cache_Controller
 
         if (!current_user_can('manage_options')) {
             $return_array['status'] = 'error';
-            $return_array['error'] = __('Permission denied', 'WPOven Triple Cache');
+            $return_array['error'] = __('Permission denied', 'OvenPress Triple Cache');
             die(wp_json_encode($return_array));
         }
 
@@ -1717,7 +1717,7 @@ class WPOCF_Cache_Controller
             die(wp_json_encode($return_array));
         }
 
-        $return_array['success_msg'] = __('Page cache disabled successfully', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Page cache disabled successfully', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }

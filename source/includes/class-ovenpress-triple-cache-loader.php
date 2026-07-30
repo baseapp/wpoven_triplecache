@@ -8,8 +8,8 @@ if (! defined('ABSPATH')) exit;
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  */
 
 /**
@@ -19,11 +19,11 @@ if (! defined('ABSPATH')) exit;
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache_Loader
+class Ovenpress_Triple_Cache_Loader
 {
 
 	/**

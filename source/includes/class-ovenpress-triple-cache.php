@@ -11,8 +11,8 @@ if (! defined('ABSPATH')) exit;
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  */
 
 /**
@@ -25,11 +25,11 @@ if (! defined('ABSPATH')) exit;
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache
+class Ovenpress_Triple_Cache
 {
 
 	/**
@@ -38,7 +38,7 @@ class Wpoven_Triple_Cache
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Wpoven_Triple_Cache_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Ovenpress_Triple_Cache_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -73,12 +73,12 @@ class Wpoven_Triple_Cache
 	 */
 	public function __construct()
 	{
-		if (defined('WPOVEN_TRIPLE_CACHE_VERSION')) {
-			$this->version = WPOVEN_TRIPLE_CACHE_VERSION;
+		if (defined('OVENPRESS_TRIPLE_CACHE_VERSION')) {
+			$this->version = OVENPRESS_TRIPLE_CACHE_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'wpoven-triple-cache';
+		$this->plugin_name = 'ovenpress-triple-cache';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -91,10 +91,10 @@ class Wpoven_Triple_Cache
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Wpoven_Triple_Cache_Loader. Orchestrates the hooks of the plugin.
-	 * - Wpoven_Triple_Cache_i18n. Defines internationalization functionality.
-	 * - Wpoven_Triple_Cache_Admin. Defines all hooks for the admin area.
-	 * - Wpoven_Triple_Cache_Public. Defines all hooks for the public side of the site.
+	 * - Ovenpress_Triple_Cache_Loader. Orchestrates the hooks of the plugin.
+	 * - Ovenpress_Triple_Cache_i18n. Defines internationalization functionality.
+	 * - Ovenpress_Triple_Cache_Admin. Defines all hooks for the admin area.
+	 * - Ovenpress_Triple_Cache_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -109,32 +109,32 @@ class Wpoven_Triple_Cache
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wpoven-triple-cache-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-ovenpress-triple-cache-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wpoven-triple-cache-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-ovenpress-triple-cache-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-wpoven-triple-cache-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-ovenpress-triple-cache-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-wpoven-triple-cache-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-ovenpress-triple-cache-public.php';
 
-		$this->loader = new Wpoven_Triple_Cache_Loader();
+		$this->loader = new Ovenpress_Triple_Cache_Loader();
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Wpoven_Triple_Cache_i18n class in order to set the domain and to register the hook
+	 * Uses the Ovenpress_Triple_Cache_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -143,7 +143,7 @@ class Wpoven_Triple_Cache
 	private function set_locale()
 	{
 
-		$plugin_i18n = new Wpoven_Triple_Cache_i18n();
+		$plugin_i18n = new Ovenpress_Triple_Cache_i18n();
 
 		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
@@ -158,7 +158,7 @@ class Wpoven_Triple_Cache
 	private function define_admin_hooks()
 	{
 
-		$plugin_admin = new Wpoven_Triple_Cache_Admin($this->get_plugin_name(), $this->get_version());
+		$plugin_admin = new Ovenpress_Triple_Cache_Admin($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -175,7 +175,7 @@ class Wpoven_Triple_Cache
 	private function define_public_hooks()
 	{
 
-		$plugin_public = new Wpoven_Triple_Cache_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public = new Ovenpress_Triple_Cache_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
@@ -190,7 +190,7 @@ class Wpoven_Triple_Cache
 	{
 
 		// Load the settings
-		$this->options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$this->options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 		// Setup Caching setup 
 		$this->_detect_content_change();
 
@@ -213,7 +213,7 @@ class Wpoven_Triple_Cache
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Wpoven_Triple_Cache_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Ovenpress_Triple_Cache_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader()
 	{

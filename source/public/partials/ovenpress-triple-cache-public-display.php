@@ -10,8 +10,8 @@ if (! defined('ABSPATH')) exit;
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/public/partials
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/public/partials
  */
 ?>
 

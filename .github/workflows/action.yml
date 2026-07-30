@@ -15,12 +15,12 @@ on:
         default: "1.0.2"
 
 env:
-  PLUGIN_SLUG: "wpoven-triple-cache"
+  PLUGIN_SLUG: "ovenpress-triple-cache"
   WP_PATH: /var/www/html
-  PLUGIN_PATH: /var/www/html/wp-content/plugins/wpoven_triplecache
+  PLUGIN_PATH: /var/www/html/wp-content/plugins/ovenpress_triplecache
   WORDPRESS_URL: http://localhost
   ADMIN_USER: admin
-  ADMIN_PASSWORD: Wpoven@baseapp1
+  ADMIN_PASSWORD: Ovenpress@baseapp1
   ADMIN_EMAIL: admin@example.com
 
 jobs:
@@ -93,7 +93,7 @@ jobs:
           sudo mkdir -p $PLUGIN_PATH
           # Clone the repository into a temporary directory
           TEMP_DIR=$(mktemp -d)
-          git clone https://github.com/baseapp/wpoven_triplecache.git $TEMP_DIR
+          git clone https://github.com/baseapp/ovenpress_triplecache.git $TEMP_DIR
           cd $TEMP_DIR
           git submodule init
           git submodule sync
@@ -108,14 +108,14 @@ jobs:
         id: plugin-check
         run: |
           cd $WP_PATH
-          wp plugin activate wpoven_triplecache
-          wp plugin verify-checksums wpoven_triplecache
+          wp plugin activate ovenpress_triplecache
+          wp plugin verify-checksums ovenpress_triplecache
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Strip updater for plugin check
         run: |
           sudo rm -rf $PLUGIN_PATH/includes/libraries/plugin-update-checker
-          sudo sed -i '/UPDATER START/,/UPDATER END/d' $PLUGIN_PATH/wpoven-triple-cache.php
+          sudo sed -i '/UPDATER START/,/UPDATER END/d' $PLUGIN_PATH/ovenpress-triple-cache.php
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@v1
@@ -137,7 +137,7 @@ jobs:
       - name: Verify Plugin Accessibility
         run: |
           SITE_URL="http://localhost"
-          PLUGIN_SETTINGS_PAGE="$SITE_URL/wp-admin/admin.php?page=wpoven-triple-cache"
+          PLUGIN_SETTINGS_PAGE="$SITE_URL/wp-admin/admin.php?page=ovenpress-triple-cache"
 
           MAIN_PAGE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL")
           SETTINGS_PAGE_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$PLUGIN_SETTINGS_PAGE")
@@ -187,21 +187,21 @@ jobs:
         run: |
           sed -i "s/\*\*Tested up to:\*\* [0-9.]*/**Tested up to:** ${{ github.event.inputs.wp_version || '6.9' }}/" README.md
           sed -i "s/\*\*Stable tag:\*\* [0-9.]*/**Stable tag:** ${{ steps.versions.outputs.plugin_version }}/" README.md
-          sed -i "s|/releases/download/[0-9.]*/wpoven-triple-cache-[0-9-]*.zip|/releases/download/${{ steps.versions.outputs.plugin_version }}/${{ steps.versions.outputs.zip_name }}|" README.md
+          sed -i "s|/releases/download/[0-9.]*/ovenpress-triple-cache-[0-9-]*.zip|/releases/download/${{ steps.versions.outputs.plugin_version }}/${{ steps.versions.outputs.zip_name }}|" README.md
 
           # Update README.txt
           sed -i "s/Tested up to: [0-9.]*/Tested up to: ${{ github.event.inputs.wp_version || '6.9' }}/" README.txt
           sed -i "s/Stable tag: [0-9.]*/Stable tag: ${{ steps.versions.outputs.plugin_version }}/" README.txt
-          sed -i "s|/releases/download/[0-9.]*/wpoven-triple-cache-[0-9-]*.zip|/releases/download/${{ steps.versions.outputs.plugin_version }}/${{ steps.versions.outputs.zip_name }}|" README.txt
+          sed -i "s|/releases/download/[0-9.]*/ovenpress-triple-cache-[0-9-]*.zip|/releases/download/${{ steps.versions.outputs.plugin_version }}/${{ steps.versions.outputs.zip_name }}|" README.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ steps.versions.outputs.zip_name }}
           tag_name: ${{ steps.versions.outputs.plugin_version }}
-          name: "WPOven Triple Cache v${{ steps.versions.outputs.plugin_version }}"
+          name: "Ovenpress Triple Cache v${{ steps.versions.outputs.plugin_version }}"
           body: |
-            🚀 WPOven Triple Cache Release v${{ steps.versions.outputs.plugin_version }}
+            🚀 Ovenpress Triple Cache Release v${{ steps.versions.outputs.plugin_version }}
 
             Release Date: ${{ steps.versions.outputs.release_date }}
             Tested with WordPress: ${{ github.event.inputs.wp_version || '6.9' }}

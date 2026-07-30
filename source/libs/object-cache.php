@@ -7,7 +7,7 @@
  * Place at: wp-content/object-cache.php
  *
  * Composer autoload path used:
- * wp-content/plugins/wpoven-triple-cache/includes/libraries/vendor/autoload.php
+ * wp-content/plugins/ovenpress-triple-cache/includes/libraries/vendor/autoload.php
  */
 
 if (!defined('ABSPATH')) {
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 /* -------------------------
  * Composer Autoloader
  * ------------------------- */
-$composer = WP_CONTENT_DIR . '/plugins/wpoven-triple-cache/includes/libraries/vendor/autoload.php';
+$composer = WP_CONTENT_DIR . '/plugins/ovenpress-triple-cache/includes/libraries/vendor/autoload.php';
 
 if (!file_exists($composer)) {
     error_log('object-cache: Composer autoload not found at: ' . $composer);
@@ -59,7 +59,7 @@ CacheManager::setDefaultConfig(
 
 global $wpdb;
 
-function wpoven_get_cache_options()
+function ovenpress_get_cache_options()
 {
     global $wpdb;
 
@@ -71,7 +71,7 @@ function wpoven_get_cache_options()
 
     // Try to load the option safely (no get_option!)
     $row = $wpdb->get_var(
-        "SELECT option_value FROM {$wpdb->options} WHERE option_name = 'wpoven-triple-cache' LIMIT 1"
+        "SELECT option_value FROM {$wpdb->options} WHERE option_name = 'ovenpress-triple-cache' LIMIT 1"
     );
 
     $cache = $row ? maybe_unserialize($row) : [];
@@ -79,7 +79,7 @@ function wpoven_get_cache_options()
     return $cache;
 }
 
-$options = wpoven_get_cache_options();
+$options = ovenpress_get_cache_options();
 
 $redis_enable = isset($options['redis_enable']) ? $options['redis_enable'] : false;
 $file_enable = isset($options['file_enable']) ? $options['file_enable'] : false;
@@ -327,7 +327,7 @@ class WP_PhpFastCache_Object_Cache
                 $found = true;
 
                 if (!headers_sent()) {
-                    header('WPOven-Redis-File-Object-Cache: HIT');
+                    header('OvenPress-Redis-File-Object-Cache: HIT');
                 }
 
                 return $local;
@@ -338,7 +338,7 @@ class WP_PhpFastCache_Object_Cache
             $found = false;
 
             if (!headers_sent()) {
-                header('WPOven-Redis-File-Object-Cache: MISS');
+                header('OvenPress-Redis-File-Object-Cache: MISS');
             }
 
             return false;
@@ -349,7 +349,7 @@ class WP_PhpFastCache_Object_Cache
 
             if ($item->isHit()) {
                 if (!headers_sent()) {
-                    header('WPOven-Redis-File-Object-Cache: HIT');
+                    header('OvenPress-Redis-File-Object-Cache: HIT');
                 }
 
                 $val = $item->get();
@@ -358,7 +358,7 @@ class WP_PhpFastCache_Object_Cache
                 return $val;
             } else {
                 if (!headers_sent()) {
-                    header('WPOven-Redis-File-Object-Cache: MISS');
+                    header('OvenPress-Redis-File-Object-Cache: MISS');
                 }
             }
         } catch (Throwable $e) {

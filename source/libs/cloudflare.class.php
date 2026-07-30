@@ -203,7 +203,7 @@ class WPOCF_Cloudflare
                 foreach ($json['result'] as $domain_data) {
 
                     if (!isset($domain_data['name']) || !isset($domain_data['id'])) {
-                        $error = __('Unable to retrive zone id due to invalid response data', 'WPOven Triple Cache');
+                        $error = __('Unable to retrive zone id due to invalid response data', 'OvenPress Triple Cache');
                         return false;
                     }
 
@@ -214,7 +214,7 @@ class WPOCF_Cloudflare
 
 
         if (!count($zone_id_list)) {
-            $error = __('Unable to find domains configured on Cloudflare', 'WPOven Triple Cache');
+            $error = __('Unable to find domains configured on Cloudflare', 'OvenPress Triple Cache');
             return false;
         }
 
@@ -253,7 +253,7 @@ class WPOCF_Cloudflare
             return $json['result']['value'];
         }
 
-        $error = __('Unable to find Browser Cache TTL settings ', 'WPOven Triple Cache');
+        $error = __('Unable to find Browser Cache TTL settings ', 'OvenPress Triple Cache');
         return false;
     }
 
@@ -616,7 +616,7 @@ class WPOCF_Cloudflare
             foreach ($json['result'] as $account_data) {
 
                 if (!isset($account_data['id'])) {
-                    $error = __('Unable to retrive account ID', 'WPOven Triple Cache');
+                    $error = __('Unable to retrive account ID', 'OvenPress Triple Cache');
                     return false;
                 }
 
@@ -650,7 +650,7 @@ class WPOCF_Cloudflare
         }
 
         if ($account_id == '') {
-            $error = __('Unable to find a valid account ID.', 'WPOven Triple Cache');
+            $error = __('Unable to find a valid account ID.', 'OvenPress Triple Cache');
             return false;
         }
 
@@ -680,11 +680,11 @@ class WPOCF_Cloudflare
 
         $headers = wp_remote_retrieve_headers($response);
 
-        if (!$test_static && !isset($headers['Wpoven-Cache'])) {
+        if (!$test_static && !isset($headers['Ovenpress-Cache'])) {
             return false;
         }
 
-        if (!$test_static && $headers['Wpoven-Cache'] == 'no-cache') {
+        if (!$test_static && $headers['Ovenpress-Cache'] == 'no-cache') {
             return false;
         }
 
@@ -696,19 +696,19 @@ class WPOCF_Cloudflare
             return false;
         }
 
-        if (!$test_static && !isset($headers['Wpoven-Cache-Cache-Control'])) {
+        if (!$test_static && !isset($headers['Ovenpress-Cache-Cache-Control'])) {
             return false;
         }
 
-        if (strcasecmp($headers['Cache-Control'], '{resp:Wpoven-cache-cache-control}') == 0) {
+        if (strcasecmp($headers['Cache-Control'], '{resp:Ovenpress-cache-cache-control}') == 0) {
             return false;
         }
 
-        if ($this->worker_mode == true && !isset($headers['Wpoven-cache-worker-status'])) {
+        if ($this->worker_mode == true && !isset($headers['Ovenpress-cache-worker-status'])) {
             return false;
         }
 
-        if ($this->worker_mode == true && (strcasecmp($headers['Wpoven-cache-worker-status'], 'hit') == 0 || strcasecmp($headers['Wpoven-cache-worker-status'], 'miss') == 0)) {
+        if ($this->worker_mode == true && (strcasecmp($headers['Ovenpress-cache-worker-status'], 'hit') == 0 || strcasecmp($headers['Ovenpress-cache-worker-status'], 'miss') == 0)) {
             return true;
         }
 
@@ -832,11 +832,11 @@ class WPOCF_Cloudflare
 
             // Error on both dynamic and static test
             if (!$headers_static_resource) {
-                $error .= __('Page caching seems not working for both dynamic and static pages.', 'WPOven Triple Cache');
+                $error .= __('Page caching seems not working for both dynamic and static pages.', 'OvenPress Triple Cache');
             }
             // Error on dynamic test only
             else {
-                $error .= sprintf(__('Page caching is working for static page but seems not working for dynamic pages.', 'WPOven Triple Cache'), $url_static_resource);
+                $error .= sprintf(__('Page caching is working for static page but seems not working for dynamic pages.', 'OvenPress Triple Cache'), $url_static_resource);
             }
 
             $return_array['status'] = 'error';
@@ -845,7 +845,7 @@ class WPOCF_Cloudflare
             die(wp_json_encode($return_array));
         }
 
-        $return_array['success_msg'] = __('Page caching is working properly', 'WPOven Triple Cache');
+        $return_array['success_msg'] = __('Page caching is working properly', 'OvenPress Triple Cache');
 
         die(wp_json_encode($return_array));
     }

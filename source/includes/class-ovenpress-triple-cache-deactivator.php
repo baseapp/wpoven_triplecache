@@ -6,8 +6,8 @@
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  */
 
 /**
@@ -16,11 +16,12 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache_Deactivator {
+class Ovenpress_Triple_Cache_Deactivator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,5 @@ class Wpoven_Triple_Cache_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
-
-	}
-
+	public static function deactivate() {}
 }

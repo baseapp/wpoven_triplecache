@@ -3,7 +3,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     //remove extra menu title
-    const menuItems = document.querySelectorAll("li#toplevel_page_wpoven");
+    const menuItems = document.querySelectorAll("li#toplevel_page_ovenpress");
     const menuArray = Array.from(menuItems);
     for (let i = 1; i < menuArray.length; i++) {
       menuArray[i].remove();
@@ -11,7 +11,7 @@
 
     // Remove rudux munu title.
     var reduxMenu = document.querySelector(
-      "li.toplevel_page_wpoven-triple-cache"
+      "li.toplevel_page_ovenpress-triple-cache",
     );
     if (reduxMenu) {
       reduxMenu.remove();
@@ -76,7 +76,7 @@
         var doNotCache = document.querySelector('[id="do-not-cache-select"]');
         const doNotCacheOptions = Array.from(doNotCache.options);
         const doNotCacheOptionsValues = doNotCacheOptions.map(
-          (option) => option.value
+          (option) => option.value,
         );
         doNotCacheOptionsValues.forEach(function (item) {
           var newInput = document.createElement("input");
@@ -104,7 +104,7 @@
         } else {
           var apiToken = document.querySelector('[id="wpocf_cf_apitoken"]');
           var apiTokenDomain = document.querySelector(
-            '[id="wpocf_cf_apitoken_domain"]'
+            '[id="wpocf_cf_apitoken_domain"]',
           );
           if (
             apiToken.value.trim() === "" ||
@@ -125,24 +125,24 @@
   document.addEventListener("click", function (e) {
     // Redis elements
     const redisEnable = document.querySelector(
-      "#wpoven-triple-cache-redis_enable .cb-enable"
+      "#ovenpress-triple-cache-redis_enable .cb-enable",
     );
     const redisDisable = document.querySelector(
-      "#wpoven-triple-cache-redis_enable .cb-disable"
+      "#ovenpress-triple-cache-redis_enable .cb-disable",
     );
     const redisInput = document.querySelector(
-      "input[name='wpoven-triple-cache[redis_enable]']"
+      "input[name='ovenpress-triple-cache[redis_enable]']",
     );
 
     // File elements
     const fileEnable = document.querySelector(
-      "#wpoven-triple-cache-file_enable .cb-enable"
+      "#ovenpress-triple-cache-file_enable .cb-enable",
     );
     const fileDisable = document.querySelector(
-      "#wpoven-triple-cache-file_enable .cb-disable"
+      "#ovenpress-triple-cache-file_enable .cb-disable",
     );
     const fileInput = document.querySelector(
-      "input[name='wpoven-triple-cache[file_enable]']"
+      "input[name='ovenpress-triple-cache[file_enable]']",
     );
 
     if (!redisEnable || !fileEnable) return;
@@ -150,7 +150,7 @@
     // If Redis is Enabled → Disable File Cache
     if (
       e.target.closest(".cb-enable") &&
-      e.target.closest("#wpoven-triple-cache-redis_enable")
+      e.target.closest("#ovenpress-triple-cache-redis_enable")
     ) {
       // Set Redis ON
       redisInput.value = "1";
@@ -166,7 +166,7 @@
     // If File Cache is Enabled → Disable Redis
     if (
       e.target.closest(".cb-enable") &&
-      e.target.closest("#wpoven-triple-cache-file_enable")
+      e.target.closest("#ovenpress-triple-cache-file_enable")
     ) {
       // Set File ON
       fileInput.value = "1";
@@ -181,8 +181,8 @@
   });
 
   async function flush_cache() {
-    const ajax_nonce = document.getElementById("wpoven-ajax-nonce").innerText;
-    const ajax_url = document.getElementById("wpoven-ajax-url").innerText;
+    const ajax_nonce = ovenpressAjax.nonce;
+    const ajax_url = ovenpressAjax.ajax_url;
 
     try {
       const response = await fetch(ajax_url, {
@@ -190,7 +190,7 @@
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         },
-        body: `action=wpoven_flush_object_cache&security=${ajax_nonce}`,
+        body: `action=ovenpress_flush_object_cache&security=${ajax_nonce}`,
         credentials: "same-origin",
       });
       const data = await response.json();
@@ -205,19 +205,19 @@
   }
 
   async function flush_varnish_cache() {
-    const ajax_nonce = document.getElementById("wpoven-ajax-nonce").innerText;
-    const ajax_url = document.getElementById("wpoven-ajax-url").innerText;
-
+    const ajax_nonce = ovenpressAjax.nonce;
+    const ajax_url = ovenpressAjax.ajax_url;
     try {
       const response = await fetch(ajax_url, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
         },
-        body: `action=wpoven_flush_varnish_cache&security=${ajax_nonce}`,
+        body: `action=ovenpress_flush_varnish_cache&security=${ajax_nonce}`,
         credentials: "same-origin",
       });
       const data = await response.json();
+
       if (data.status === "success") {
         alert(data.message);
       } else {

@@ -136,8 +136,8 @@ class WPOCF_Backend
 
             $admin_bar->add_menu(array(
                 'id' => 'wpocf-cache-toolbar-container',
-                'title' => '<span class="ab-icon"></span><span class="ab-label">' . __('WPOven CF Cache', 'WPOven Triple Cache') . '</span>',
-                'href' => current_user_can('manage_options') ? admin_url('admin.php?page=' . WPOVEN_TRIPLE_CACHE_SLUG) : '#',
+                'title' => '<span class="ab-icon"></span><span class="ab-label">' . __('OvenPress CF Cache', 'OvenPress Triple Cache') . '</span>',
+                'href' => current_user_can('manage_options') ? admin_url('admin.php?page=' . OVENPRESS_TRIPLE_CACHE_SLUG) : '#',
             ));
 
             if ($this->main_instance->get_single_config('cf_cache_enabled', 0) > 0) {
@@ -147,7 +147,7 @@ class WPOCF_Backend
                 $admin_bar->add_menu(array(
                     'id' => 'wpocf-cache-toolbar-purge-all',
                     'parent' => 'wpocf-cache-toolbar-container',
-                    'title' => __('Purge whole cache', 'WPOven Triple Cache'),
+                    'title' => __('Purge whole cache', 'OvenPress Triple Cache'),
                     //'href' => add_query_arg( array( 'page' => 'wpocf-cache-index', $this->objects['cache_controller']->get_cache_buster() => 1, 'swcfpc-purge-cache' => 1), admin_url('options-general.php' ) ),
                     'href' => '#'
                 ));
@@ -157,7 +157,7 @@ class WPOCF_Backend
                     $admin_bar->add_menu(array(
                         'id' => 'wpocf-cache-toolbar-purge-single',
                         'parent' => 'wpocf-cache-toolbar-container',
-                        'title' => __('Purge cache for this page only', 'WPOven Triple Cache'),
+                        'title' => __('Purge cache for this page only', 'OvenPress Triple Cache'),
                         'href' => "#{$post->ID}"
                     ));
                 }
@@ -168,7 +168,7 @@ class WPOCF_Backend
     function add_post_row_actions($actions, $post)
     {
         if (!in_array($post->post_type, ['shop_order', 'shop_subscription'])) {
-            $actions['wpocf_single_purge'] = '<a class="wpocf_action_row_single_post_cache_purge" data-post_id="' . $post->ID . '" href="#">' . __('Purge CF Cache', 'WPOven Triple Cache') . '</a>';
+            $actions['wpocf_single_purge'] = '<a class="wpocf_action_row_single_post_cache_purge" data-post_id="' . $post->ID . '" href="#">' . __('Purge CF Cache', 'OvenPress Triple Cache') . '</a>';
         }
         return $actions;
     }

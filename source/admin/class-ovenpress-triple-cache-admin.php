@@ -8,8 +8,8 @@ if (! defined('ABSPATH')) exit;
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/admin
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/admin
  */
 
 use PSpell\Config;
@@ -24,11 +24,11 @@ use Phpfastcache\Drivers\Redis\Config as RedisConfig;
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/admin
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/admin
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache_Admin
+class Ovenpress_Triple_Cache_Admin
 {
 
 	/**
@@ -48,7 +48,7 @@ class Wpoven_Triple_Cache_Admin
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
-	private $_wpoven_triple_cache;
+	private $_ovenpress_triple_cache;
 	private $config   = false;
 	private $objects  = array();
 	/**
@@ -80,7 +80,7 @@ class Wpoven_Triple_Cache_Admin
 		}
 		$this->include_libs();
 
-		$composer = WP_CONTENT_DIR . '/plugins/wpoven-triple-cache/includes/libraries/vendor/autoload.php';
+		$composer = WP_CONTENT_DIR . '/plugins/ovenpress-triple-cache/includes/libraries/vendor/autoload.php';
 
 		if (!file_exists($composer)) {
 			error_log('object-cache: Composer autoload not found at: ' . $composer);
@@ -88,46 +88,63 @@ class Wpoven_Triple_Cache_Admin
 		}
 
 		require_once $composer;
-		add_action('admin_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
-		add_action('wp_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
+		// add_action('admin_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
+		// add_action('wp_footer', array($this, 'add_ajax_nonce_to_admin_footer'));
 
-		add_action('wp_ajax_wpoven_flush_object_cache', [$this, 'flush_object_cache_handler']);
-		add_action('wp_ajax_nopriv_wpoven_flush_object_cache', [$this, 'flush_object_cache_handler']);
+		add_action('wp_ajax_ovenpress_flush_object_cache', [$this, 'flush_object_cache_handler']);
+		add_action('wp_ajax_nopriv_ovenpress_flush_object_cache', [$this, 'flush_object_cache_handler']);
 
-		add_action('wp_ajax_wpoven_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
-		add_action('wp_ajax_nopriv_wpoven_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
+		add_action('wp_ajax_ovenpress_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
+		add_action('wp_ajax_nopriv_ovenpress_flush_varnish_cache', [$this, 'flush_varnish_cache_handler']);
 
-		add_action('admin_bar_menu', [$this, 'wpoven_add_single_cache_clear_button'], 101);
+		add_action('admin_bar_menu', [$this, 'ovenpress_add_single_cache_clear_button'], 101);
 
-		add_action('admin_post_wpoven_clear_object_cache', [$this, 'clear_object_cache_handler']);
-		add_action('admin_post_wpoven_clear_varnish_cache', [$this, 'clear_varnish_cache_handler']);
+		add_action('admin_post_ovenpress_clear_object_cache', [$this, 'clear_object_cache_handler']);
+		add_action('admin_post_ovenpress_clear_varnish_cache', [$this, 'clear_varnish_cache_handler']);
 	}
 
 	function flush_varnish_cache_handler()
 	{
-		check_ajax_referer('wpoven_ajax_nonce', 'security');
+		check_ajax_referer('ovenpress_ajax_nonce', 'security');
 
 		$return_array = array();
-		$this->_wpoven_triple_cache->_clear_varnish_cache();
+		$this->_ovenpress_triple_cache->_clear_varnish_cache();
 
 		$return_array['status'] = 'success';
-		$return_array['message'] = __('Varnish cache flushed successfully.', 'wpoven-triple-cache');
+		$return_array['message'] = __('Varnish cache flushed successfully.', 'ovenpress-triple-cache');
 
 		die(wp_json_encode($return_array));
 	}
 
 	function clear_object_cache_handler()
 	{
+		check_admin_referer('ovenpress_clear_cache');
+
 		global $wp_object_cache;
-		$result = $wp_object_cache->flush();
-		wp_safe_redirect(wp_get_referer());
+
+		if ($wp_object_cache) {
+			$wp_object_cache->flush();
+		}
+
+		$redirect = ! empty($_GET['redirect_to'])
+			? esc_url_raw(wp_unslash($_GET['redirect_to']))
+			: admin_url();
+
+		wp_safe_redirect($redirect);
 		exit;
 	}
 
 	function clear_varnish_cache_handler()
 	{
-		$this->_wpoven_triple_cache->_clear_varnish_cache();
-		wp_safe_redirect(wp_get_referer());
+		check_admin_referer('ovenpress_clear_cache');
+
+		$this->_ovenpress_triple_cache->_clear_varnish_cache();
+
+		$redirect = ! empty($_GET['redirect_to'])
+			? esc_url_raw(wp_unslash($_GET['redirect_to']))
+			: admin_url();
+
+		wp_safe_redirect($redirect);
 		exit;
 	}
 
@@ -144,15 +161,15 @@ class Wpoven_Triple_Cache_Admin
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Wpoven_Triple_Cache_Loader as all of the hooks are defined
+		 * defined in Ovenpress_Triple_Cache_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Wpoven_Triple_Cache_Loader will then create the relationship
+		 * The Ovenpress_Triple_Cache_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wpoven-triple-cache-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/ovenpress-triple-cache-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -167,15 +184,23 @@ class Wpoven_Triple_Cache_Admin
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Wpoven_Triple_Cache_Loader as all of the hooks are defined
+		 * defined in Ovenpress_Triple_Cache_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Wpoven_Triple_Cache_Loader will then create the relationship
+		 * The Ovenpress_Triple_Cache_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wpoven-triple-cache-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ovenpress-triple-cache-admin.js', array('jquery'), $this->version, false);
+		wp_localize_script(
+			$this->plugin_name,
+			'ovenpressAjax',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce'    => wp_create_nonce('ovenpress_ajax_nonce'),
+			)
+		);
 	}
 
 	function include_libs()
@@ -198,7 +223,7 @@ class Wpoven_Triple_Cache_Admin
 		require_once WPOCF_PLUGIN_PATH . 'libs/backend.class.php';
 		require_once WPOCF_PLUGIN_PATH . 'libs/js-optimizer.class.php';
 
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 		$js_optimizer = new WPOCF_JS_Optimizer($options);
 		if (isset($options['jsopt_defer']) || isset($options['jsopt_delay']) || isset($options['lazyload_images'])) {
 			if ($options['jsopt_defer'] || $options['jsopt_delay'] || $options['lazyload_images']) {
@@ -235,76 +260,76 @@ class Wpoven_Triple_Cache_Admin
 	{
 ?>
 		<script type="text/javascript">
-			var ajax_nonce = '<?php echo esc_html(wp_create_nonce('wpoven_ajax_nonce')); ?>';
+			var ajax_nonce = '<?php echo esc_html(wp_create_nonce('ovenpress_ajax_nonce')); ?>';
 			var ajax_url = '<?php echo esc_html(admin_url('admin-ajax.php')); ?>';
-			document.write('<div id="wpoven-ajax-nonce" style="display:none;">' + ajax_nonce + '</div>');
-			document.write('<div id="wpoven-ajax-url" style="display:none;">' + ajax_url + '</div>');
+			document.write('<div id="ovenpress-ajax-nonce" style="display:none;">' + ajax_nonce + '</div>');
+			document.write('<div id="ovenpress-ajax-url" style="display:none;">' + ajax_url + '</div>');
 		</script>
 <?php
 	}
 
 	function flush_object_cache_handler()
 	{
-		check_ajax_referer('wpoven_ajax_nonce', 'security');
+		check_ajax_referer('ovenpress_ajax_nonce', 'security');
 
 		$return_array = array();
 		global $wp_object_cache;
 		$result = $wp_object_cache->flush();
 		if ($result) {
 			$return_array['status'] = 'success';
-			$return_array['message'] = __('Object cache flushed successfully.', 'wpoven-triple-cache');
+			$return_array['message'] = __('Object cache flushed successfully.', 'ovenpress-triple-cache');
 		} else {
 			$return_array['status'] = 'error';
-			$return_array['message'] = __('Failed to flush object cache.', 'wpoven-triple-cache');
+			$return_array['message'] = __('Failed to flush object cache.', 'ovenpress-triple-cache');
 		}
 
 		die(wp_json_encode($return_array));
 	}
 
-	function wpoven_add_single_cache_clear_button($wp_admin_bar)
+	function ovenpress_add_single_cache_clear_button($wp_admin_bar)
 	{
 		if (!is_user_logged_in()) return;
 
 		// Toolbar button
 		// Main Title in Toolbar
 		$wp_admin_bar->add_node([
-			'id'    => 'wpoven_cache_main',
+			'id'    => 'ovenpress_cache_main',
 			'title' => '🧹 Triple Cache',
 			'href'  => false, // Clicking does nothing
 			'meta'  => [
-				'class' => 'wpoven-cache-toolbar-title',
+				'class' => 'ovenpress-cache-toolbar-title',
 			]
 		]);
 
 		// Sub-item: Clear Object Cache
 		$wp_admin_bar->add_node([
-			'id'     => 'wpoven_clear_object_cache',
-			'parent' => 'wpoven_cache_main',
+			'id'     => 'ovenpress_clear_object_cache',
+			'parent' => 'ovenpress_cache_main',
 			'title'  => 'Clear Object Cache',
 			'href'   => wp_nonce_url(
-				admin_url('admin-post.php?action=wpoven_clear_object_cache'),
-				'wpoven_clear_cache'
+				admin_url('admin-post.php?action=ovenpress_clear_object_cache'),
+				'ovenpress_clear_cache'
 			),
 		]);
 
 		$wp_admin_bar->add_node([
-			'id'     => 'wpoven_clear_varnish_cache',
-			'parent' => 'wpoven_cache_main',
+			'id'     => 'ovenpress_clear_varnish_cache',
+			'parent' => 'ovenpress_cache_main',
 			'title'  => 'Clear Varnish Cache',
 			'href'   => wp_nonce_url(
-				admin_url('admin-post.php?action=wpoven_clear_varnish_cache'),
-				'wpoven_clear_cache'
+				admin_url('admin-post.php?action=ovenpress_clear_varnish_cache'),
+				'ovenpress_clear_cache'
 			),
 		]);
 
 		// Sub-item: Clear Redis Cache
 		// $wp_admin_bar->add_node([
-		// 	'id'     => 'wpoven_clear_cf_cache',
-		// 	'parent' => 'wpoven_cache_main',
+		// 	'id'     => 'ovenpress_clear_cf_cache',
+		// 	'parent' => 'ovenpress_cache_main',
 		// 	'title'  => 'Clear Cloudflare Cache',
 		// 	'href'   => wp_nonce_url(
-		// 		admin_url('admin-post.php?action=wpoven_clear_redis_cache'),
-		// 		'wpoven_clear_cache'
+		// 		admin_url('admin-post.php?action=ovenpress_clear_redis_cache'),
+		// 		'ovenpress_clear_cache'
 		// 	),
 		// ]);
 	}
@@ -485,7 +510,7 @@ class Wpoven_Triple_Cache_Admin
 
 		$parts = wp_parse_url(home_url());
 
-		return WP_CONTENT_DIR . "/wpoven-cloudflare-cache/{$parts['host']}";
+		return WP_CONTENT_DIR . "/ovenpress-cloudflare-cache/{$parts['host']}";
 	}
 
 
@@ -684,10 +709,10 @@ class Wpoven_Triple_Cache_Admin
 	/**
 	 * Add a admin menu.
 	 */
-	function wpoven_triple_cache_menu()
+	function ovenpress_triple_cache_menu()
 	{
-		add_menu_page('WPOven Plugins', 'WPOven Plugins', '', 'wpoven', 'manage_options', plugin_dir_url(__FILE__) . '/img/logo.png');
-		add_submenu_page('wpoven', 'Triple Cache', 'Triple Cache', 'manage_options', WPOVEN_TRIPLE_CACHE_SLUG);
+		add_menu_page('OvenPress Plugins', 'OvenPress Plugins', '', 'ovenpress', 'manage_options', plugin_dir_url(__FILE__) . '/img/logo.png');
+		add_submenu_page('ovenpress', 'Triple Cache', 'Triple Cache', 'manage_options', OVENPRESS_TRIPLE_CACHE_SLUG);
 	}
 
 	function cf_general_settings()
@@ -944,7 +969,7 @@ class Wpoven_Triple_Cache_Admin
 			$this->objects['cache_controller']->write_htaccess($error_msg);
 
 			$this->update_config();
-			$success_msg = __('Settings updated successfully', 'WPOven Triple Cache');
+			$success_msg = __('Settings updated successfully', 'OvenPress Triple Cache');
 		}
 
 		$zone_id_list = $this->get_single_config('cf_zoneid_list', array());
@@ -977,7 +1002,7 @@ class Wpoven_Triple_Cache_Admin
 			}
 		}
 
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 		$cf_auth_mode = $options['wpocf_cf_auth_mode'] ?? null;
 		$domain_key_domain = $options['wpocf_cf_zoneid'] ?? null;
 		$api_token_domain = $options['wpocf_cf_apitoken_domain'] ?? null;
@@ -1275,7 +1300,7 @@ class Wpoven_Triple_Cache_Admin
 
 	function is_redis_running()
 	{
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 
 		$host     = isset($options['redis_host']) ? $options['redis_host'] : '127.0.0.1';
 		$port     = isset($options['redis_port']) ? (int) $options['redis_port'] : 6379;
@@ -1307,7 +1332,7 @@ class Wpoven_Triple_Cache_Admin
 
 	function is_redis_enable()
 	{
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 		$redis_enable = isset($options['redis_enable']) ? $options['redis_enable'] : false;
 		$file_enable = isset($options['file_enable']) ? $options['file_enable'] : false;
 		if ($redis_enable || $file_enable) {
@@ -1341,7 +1366,7 @@ class Wpoven_Triple_Cache_Admin
 
 	protected function object_cache_settings()
 	{
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
 		$redis_enable = isset($options['redis_enable']) ? $options['redis_enable'] : false;
 		$file_enable = isset($options['file_enable']) ? $options['file_enable'] : false;
 		$result = array();
@@ -1354,18 +1379,18 @@ class Wpoven_Triple_Cache_Admin
 				'id'    => 'redis_not_running_info',
 				'type'  => 'info',
 				'style' => 'critical',
-				'desc'  => esc_html__('Redis server is not detected or not running.', 'wpoven-triple-cache'),
+				'desc'  => esc_html__('Redis server is not detected or not running.', 'ovenpress-triple-cache'),
 			);
 		} else {
 
 			$result[] = array(
 				'id'    => 'redis_enable',
 				'type'  => 'switch',
-				'title' => esc_html__('Redis Object Cache', 'wpoven-triple-cache'),
-				'desc'  => esc_html__('Enable for Redis-based WordPress object caching.', 'wpoven-triple-cache'),
+				'title' => esc_html__('Redis Object Cache', 'ovenpress-triple-cache'),
+				'desc'  => esc_html__('Enable for Redis-based WordPress object caching.', 'ovenpress-triple-cache'),
 				'subtitle' => '<button type="button" style="color:green;">Redis server running</button>',
-				'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
-				'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+				'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
+				'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
 				'default' => false,
 			);
 		}
@@ -1373,42 +1398,42 @@ class Wpoven_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'file_enable',
 			'type'  => 'switch',
-			'title' => esc_html__('File Object Cache', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Enable for File-based WordPress object caching.', 'wpoven-triple-cache'),
-			'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
-			'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+			'title' => esc_html__('File Object Cache', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Enable for File-based WordPress object caching.', 'ovenpress-triple-cache'),
+			'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
+			'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'redis_host',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Host', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Enter your Redis server hostname or IP address. Default is localhost (127.0.0.1).', 'wpoven-triple-cache'),
+			'title' => esc_html__('Redis Host', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Enter your Redis server hostname or IP address. Default is localhost (127.0.0.1).', 'ovenpress-triple-cache'),
 			'default' => '127.0.0.1',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_port',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Port', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Default Redis port is 6379. Change only if your server uses a custom port.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Redis Port', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Default Redis port is 6379. Change only if your server uses a custom port.', 'ovenpress-triple-cache'),
 			'default' => '6379',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_password',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Password', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Enter Redis authentication password only if Redis requires AUTH. Leave blank if not configured.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Redis Password', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Enter Redis authentication password only if Redis requires AUTH. Leave blank if not configured.', 'ovenpress-triple-cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_database',
 			'type'  => 'spinner',
-			'title' => esc_html__('Redis Database Index', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Select the Redis database number (0–100). Using a separate DB ensures clean cache storage.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Redis Database Index', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Select the Redis database number (0–100). Using a separate DB ensures clean cache storage.', 'ovenpress-triple-cache'),
 			'default' => 0,
 			'min' => 0,
 			'max' => 100,
@@ -1437,7 +1462,7 @@ class Wpoven_Triple_Cache_Admin
 			$result[] = array(
 				'id'      => 'redis_flush',
 				'type'    => 'raw',
-				'title'   => esc_html__(' ', 'wpoven-triple-cache'),
+				'title'   => esc_html__(' ', 'ovenpress-triple-cache'),
 				'content' => $flush_cache_button,
 			);
 		}
@@ -1453,10 +1478,10 @@ class Wpoven_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'varnish_cache_enable',
 			'type'  => 'switch',
-			'title' => esc_html__('Varnish Cache', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Enable to purge Varnish cache when content is updated.', 'wpoven-triple-cache'),
-			'on'  => esc_html__('Enable', 'wpoven-triple-cache'),
-			'off' => esc_html__('Disable', 'wpoven-triple-cache'),
+			'title' => esc_html__('Varnish Cache', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Enable to purge Varnish cache when content is updated.', 'ovenpress-triple-cache'),
+			'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
+			'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
 			'default' => true,
 		);
 
@@ -1472,7 +1497,7 @@ class Wpoven_Triple_Cache_Admin
 		$result[] = array(
 			'id'      => 'varnish_flush',
 			'type'    => 'raw',
-			'title'   => esc_html__(' ', 'wpoven-triple-cache'),
+			'title'   => esc_html__(' ', 'ovenpress-triple-cache'),
 			'content' => $varnish_cache_button,
 		);
 
@@ -1491,32 +1516,32 @@ class Wpoven_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'jsopt_defer',
 			'type'  => 'switch',
-			'title' => esc_html__('Defer JavaScript', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Add the defer attribute to external JS files to speed up initial rendering.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Defer JavaScript', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Add the defer attribute to external JS files to speed up initial rendering.', 'ovenpress-triple-cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_delay',
 			'type'  => 'switch',
-			'title' => esc_html__('Delay JavaScript Execution', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Delay non-critical JS until the user interacts with the page (scroll, click, move).', 'wpoven-triple-cache'),
+			'title' => esc_html__('Delay JavaScript Execution', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Delay non-critical JS until the user interacts with the page (scroll, click, move).', 'ovenpress-triple-cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_exclude_patterns',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude JS Files / Patterns', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Add keywords or filenames (one per line) for scripts that should NOT be deferred or delayed.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Exclude JS Files / Patterns', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Add keywords or filenames (one per line) for scripts that should NOT be deferred or delayed.', 'ovenpress-triple-cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_safe_mode',
 			'type'  => 'switch',
-			'title' => esc_html__('Safe Mode for JS Optimization', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Prevents optimization from breaking inline JavaScript and essential scripts.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Safe Mode for JS Optimization', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Prevents optimization from breaking inline JavaScript and essential scripts.', 'ovenpress-triple-cache'),
 			'default' => false,
 		);
 
@@ -1534,24 +1559,24 @@ class Wpoven_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'lazyload_images',
 			'type'  => 'switch',
-			'title' => esc_html__('Lazy Load Iframes/Videos', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Apply lazy loading to YouTube videos, embeds, and iframe content.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Lazy Load Iframes/Videos', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Apply lazy loading to YouTube videos, embeds, and iframe content.', 'ovenpress-triple-cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'lazyload_exclude_classes',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude Classes from Lazy Load', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Add CSS Classes (one per line) for images or elements that should NOT be lazy-loaded.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Exclude Classes from Lazy Load', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Add CSS Classes (one per line) for images or elements that should NOT be lazy-loaded.', 'ovenpress-triple-cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'lazyload_exclude_selectors',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude Selectors from Lazy Load', 'wpoven-triple-cache'),
-			'desc'  => esc_html__('Add CSS selectors (one per line) for images or elements that should NOT be lazy-loaded.', 'wpoven-triple-cache'),
+			'title' => esc_html__('Exclude Selectors from Lazy Load', 'ovenpress-triple-cache'),
+			'desc'  => esc_html__('Add CSS selectors (one per line) for images or elements that should NOT be lazy-loaded.', 'ovenpress-triple-cache'),
 			'default' => '',
 		);
 
@@ -1560,7 +1585,7 @@ class Wpoven_Triple_Cache_Admin
 
 
 	/**
-	 * Set WPOven Triple Cache admin page.
+	 * Set OvenPress Triple Cache admin page.
 	 */
 	function setup_gui()
 	{
@@ -1568,19 +1593,19 @@ class Wpoven_Triple_Cache_Admin
 		if (!class_exists('Redux')) {
 			return;
 		}
-		$options = get_option(WPOVEN_TRIPLE_CACHE_SLUG);
-		$opt_name = WPOVEN_TRIPLE_CACHE_SLUG;
+		$options = get_option(OVENPRESS_TRIPLE_CACHE_SLUG);
+		$opt_name = OVENPRESS_TRIPLE_CACHE_SLUG;
 
 		Redux::disable_demo();
 
 		$args = array(
 			'opt_name'                  => $opt_name,
-			'display_name'              => 'WPOven Triple Cache',
+			'display_name'              => 'OvenPress Triple Cache',
 			'display_version'           => ' ',
 			//'menu_type'                 => 'menu',
 			'allow_sub_menu'            => true,
-			//	'menu_title'                => esc_html__('Triple Cache', 'WPOven Triple Cache'),
-			'page_title'                => esc_html__('WPOven Triple Cache', 'WPOven Triple Cache'),
+			//	'menu_title'                => esc_html__('Triple Cache', 'OvenPress Triple Cache'),
+			'page_title'                => esc_html__('OvenPress Triple Cache', 'OvenPress Triple Cache'),
 			'disable_google_fonts_link' => false,
 			'admin_bar'                 => false,
 			'admin_bar_icon'            => 'dashicons-portfolio',
@@ -1605,7 +1630,7 @@ class Wpoven_Triple_Cache_Admin
 			'transient_time'            => 60 * MINUTE_IN_SECONDS,
 			'output'                    => false,
 			'output_tag'                => false,
-			//'footer_credit'             => 'Please rate WPOven Triple Cache ★★★★★ on WordPress.org to support us. Thank you!',
+			//'footer_credit'             => 'Please rate OvenPress Triple Cache ★★★★★ on WordPress.org to support us. Thank you!',
 			'footer_credit'             => ' ',
 			'use_cdn'                   => false,
 			'admin_theme'               => 'wp',
@@ -1623,7 +1648,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Cloudflare Edge Cache', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Cloudflare Edge Cache', 'OvenPress Triple Cache'),
 				'id'         => 'general',
 				'subsection' => false,
 				'icon'       => 'el el-cloud',
@@ -1635,7 +1660,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Object Cache (Redis)', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Object Cache (Redis)', 'OvenPress Triple Cache'),
 				'id'         => 'object-cache',
 				'subsection' => false,
 				'icon'       => 'fa-solid fa-cubes',
@@ -1647,7 +1672,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Varnish Cache', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Varnish Cache', 'OvenPress Triple Cache'),
 				'id'         => 'varnish-cache',
 				'subsection' => false,
 				'icon'       => 'fa-solid fa-shield-halved',
@@ -1659,7 +1684,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('JavaScript Optimization', 'WPOven Triple Cache'),
+				'title'      => esc_html__('JavaScript Optimization', 'OvenPress Triple Cache'),
 				'id'         => 'js-optimization',
 				'subsection' => false,
 				'icon'       => 'fa-solid fa-code',
@@ -1671,7 +1696,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Lazy Load', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Lazy Load', 'OvenPress Triple Cache'),
 				'id'         => 'lazyload',
 				'subsection' => false,
 				'icon'       => 'fa-solid fa-image',
@@ -1683,7 +1708,7 @@ class Wpoven_Triple_Cache_Admin
 		Redux::set_section(
 			$opt_name,
 			array(
-				'title'      => esc_html__('Cache Settings', 'WPOven Triple Cache'),
+				'title'      => esc_html__('Cache Settings', 'OvenPress Triple Cache'),
 				'id'         => 'cache',
 				'subsection' => false,
 				'heading'    => 'CACHE LIFETIME SETTINGS',
@@ -1696,10 +1721,10 @@ class Wpoven_Triple_Cache_Admin
 	/**
 	 * Hook to add the admin menu.
 	 */
-	public function admin_main(Wpoven_Triple_Cache $wpoven_triple_cache)
+	public function admin_main(OvenPress_Triple_Cache $ovenpress_triple_cache)
 	{
-		$this->_wpoven_triple_cache = $wpoven_triple_cache;
-		add_action('admin_menu', array($this, 'wpoven_triple_cache_menu'));
+		$this->_ovenpress_triple_cache = $ovenpress_triple_cache;
+		add_action('admin_menu', array($this, 'ovenpress_triple_cache_menu'));
 		$this->setup_gui();
 	}
 }

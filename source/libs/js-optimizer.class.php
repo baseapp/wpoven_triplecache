@@ -31,7 +31,7 @@ class WPOCF_JS_Optimizer
         // Check if this is a complete HTML document
         if (!$this->isFullPageHtml($html)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Wpoven JS Optimizer: Not a full HTML document, skipping optimization');
+                error_log('OvenPress JS Optimizer: Not a full HTML document, skipping optimization');
             }
             return $html;
         }
@@ -148,7 +148,7 @@ class WPOCF_JS_Optimizer
 
             // Log success
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Wpoven JS Optimizer: Successfully optimized HTML');
+                error_log('OvenPress JS Optimizer: Successfully optimized HTML');
                 error_log('Original length: ' . strlen($html) . ' | Optimized length: ' . strlen($optimized));
             }
 
@@ -157,7 +157,7 @@ class WPOCF_JS_Optimizer
         } catch (Throwable $e) {
             // Log error
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Wpoven JS Optimizer Error: ' . $e->getMessage());
+                error_log('OvenPress JS Optimizer Error: ' . $e->getMessage());
                 error_log('File: ' . $e->getFile() . ':' . $e->getLine());
             }
 

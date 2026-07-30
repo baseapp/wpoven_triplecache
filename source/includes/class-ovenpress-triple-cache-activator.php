@@ -6,8 +6,8 @@
  * @link       https://www.wpoven.com
  * @since      1.0.0
  *
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  */
 
 /**
@@ -16,11 +16,12 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    Wpoven_Triple_Cache
- * @subpackage Wpoven_Triple_Cache/includes
+ * @package    Ovenpress_Triple_Cache
+ * @subpackage Ovenpress_Triple_Cache/includes
  * @author     WPOven <contact@wpoven.com>
  */
-class Wpoven_Triple_Cache_Activator {
+class Ovenpress_Triple_Cache_Activator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,5 @@ class Wpoven_Triple_Cache_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
-
-	}
-
+	public static function activate() {}
 }
