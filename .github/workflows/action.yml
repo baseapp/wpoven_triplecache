@@ -39,7 +39,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.4.20"
           extensions: mbstring, xml, mysql
           coverage: none
 
@@ -111,11 +111,6 @@ jobs:
           wp plugin activate ovenpress_triplecache
           wp plugin verify-checksums ovenpress_triplecache
           echo "status=success" >> $GITHUB_OUTPUT
-
-      - name: Strip updater for plugin check
-        run: |
-          sudo rm -rf $PLUGIN_PATH/includes/libraries/plugin-update-checker
-          sudo sed -i '/UPDATER START/,/UPDATER END/d' $PLUGIN_PATH/ovenpress-triple-cache.php
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@v1
