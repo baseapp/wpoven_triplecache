@@ -207,6 +207,7 @@
   async function flush_varnish_cache() {
     const ajax_nonce = ovenpressAjax.nonce;
     const ajax_url = ovenpressAjax.ajax_url;
+
     try {
       const response = await fetch(ajax_url, {
         method: "POST",

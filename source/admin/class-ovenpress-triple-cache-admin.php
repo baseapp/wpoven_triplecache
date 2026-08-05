@@ -1444,14 +1444,17 @@ class Ovenpress_Triple_Cache_Admin
 
 			$this->is_redis_enable();
 
-			$flush_cache_button = '<button 
+			$flush_cache_button = '
+				<div style="display:flex; justify-content:center;">
+					<button 
 						type="button" 
 						class="cache-controller button-primary csf-warning-prinmary" 
-						style="width:160px; margin-right:10px; text-align:center;" 
+						style="width:160px; margin-right:380px; margin-top:5px;" 
 						id="wpocf_redis_flush"
 					>
 						CLEAR OBJECT CACHE
-					</button>';
+					</button>
+				</div>';
 		} else {
 			$this->is_redis_enable();
 			$flush_cache_button = null;
@@ -1485,14 +1488,17 @@ class Ovenpress_Triple_Cache_Admin
 			'default' => true,
 		);
 
-		$varnish_cache_button = '<button 
+		$varnish_cache_button = '
+			<div style="display:flex; justify-content:center;">
+				<button 
 					type="button" 
 					class="varnish-cache-controller button-primary csf-warning-prinmary" 
-					style="width:170px; margin-right:10px; text-align:center;" 
+					style="width:180px; margin-right:380px; margin-top:5px;" 
 					id="varnish_cache_flush"
 				>
 					CLEAR VARNISH CACHE
-				</button>';
+				</button>
+			</div>';
 
 		$result[] = array(
 			'id'      => 'varnish_flush',
@@ -1725,6 +1731,6 @@ class Ovenpress_Triple_Cache_Admin
 	{
 		$this->_ovenpress_triple_cache = $ovenpress_triple_cache;
 		add_action('admin_menu', array($this, 'ovenpress_triple_cache_menu'));
-		$this->setup_gui();
+		add_action('admin_init', array($this, 'setup_gui'));
 	}
 }

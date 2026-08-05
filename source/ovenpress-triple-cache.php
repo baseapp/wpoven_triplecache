@@ -16,7 +16,7 @@
  * Plugin Name:       OvenPress Triple Cache
  * Plugin URI:        https://www.wpoven.com/plugins/ovenpress-triple-cache
  * Description:       Cloudflare Caching
- * Version:           1.0.2
+ * Version:           1.0.3
  * Author:            WPOven
  * Author URI:        https://www.wpoven.com/
  * License:           GPL-2.0+
@@ -37,7 +37,7 @@ if (!defined('WPINC')) {
  */
 
 
-define('OVENPRESS_TRIPLE_CACHE_VERSION', '1.0.2');
+define('OVENPRESS_TRIPLE_CACHE_VERSION', '1.0.3');
 if (!defined('OVENPRESS_TRIPLE_CACHE_SLUG'))
 	define('OVENPRESS_TRIPLE_CACHE_SLUG', 'ovenpress-triple-cache');
 
@@ -76,14 +76,16 @@ if (!defined('WPOCF_HOME_PAGE_SHOWS_POSTS'))
 	define('WPOCF_HOME_PAGE_SHOWS_POSTS', true);
 
 
-
+if (file_exists(plugin_dir_path(__FILE__) . 'includes/class-ovenpress-triple-cache-updater.php')) {
+	require_once plugin_dir_path(__FILE__) . 'includes/class-ovenpress-triple-cache-updater.php';
+}
 
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ovenpress-triple-cache-activator.php
  */
-function ovenpress_triple_cache_activate()
+function activate_ovenpress_triple_cache()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-ovenpress-triple-cache-activator.php';
 	Ovenpress_Triple_Cache_Activator::activate();
@@ -93,7 +95,7 @@ function ovenpress_triple_cache_activate()
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-ovenpress-triple-cache-deactivator.php
  */
-function ovenpress_triple_cache_deactivate()
+function deactivate_ovenpress_triple_cache()
 {
 	require_once plugin_dir_path(__FILE__) . 'includes/class-ovenpress-triple-cache-deactivator.php';
 	Ovenpress_Triple_Cache_Deactivator::deactivate();
@@ -126,8 +128,8 @@ function ovenpress_triple_cache_deactivate()
 	}
 }
 
-register_activation_hook(__FILE__, 'ovenpress_triple_cache_activate');
-register_deactivation_hook(__FILE__, 'ovenpress_triple_cache_deactivate');
+register_activation_hook(__FILE__, 'activate_ovenpress_triple_cache');
+register_deactivation_hook(__FILE__, 'deactivate_ovenpress_triple_cache');
 
 /**
  * The core plugin class that is used to define internationalization,

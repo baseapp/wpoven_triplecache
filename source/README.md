@@ -4,8 +4,8 @@
 
 **Contributors:** [WPOven](https://www.wpoven.com/)  
 **Requires at least:** 6.2  
-**Tested up to:** 6.9 
-**Stable tag:** 1.0.2 
+**Tested up to:** 7.0.2 
+**Stable tag:** 1.0.3 
 **License:** GPLv2 or later  
 **License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)  
 
@@ -65,6 +65,9 @@ Yes. This is the main purpose of this plugin.
 
 ## Changelog
 
+### 1.0.3
+- Renamed the plugin branding from WPOven to OvenPress.
+
 ### 1.0.2
 - Fixing a bug where the admin cannot delete WordPress users after activating the plugin.
 
@@ -81,6 +84,5 @@ Yes. This is the main purpose of this plugin.
 
 ## Upgrade Notice
 
-### 1.0.2 
-Fixes an issue where the admin could not delete WordPress users after activating the plugin. Includes minor bug fixes and performance improvements.
-
+### 1.0.3
+This release introduces the OvenPress brand, replacing the previous WPOven branding.
