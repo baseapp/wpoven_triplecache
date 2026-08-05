@@ -126,6 +126,7 @@ jobs:
           exclude-files: |
             .gitignore
             .gitmodules
+            includes/class-ovenpress-triple-cache-updater.php
           exclude-directories: |
             includes/libraries/redux-framework
             includes/libraries/plugin-update-checker
