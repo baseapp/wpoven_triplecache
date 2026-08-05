@@ -12,5 +12,3 @@ $ovenpress_triple_cache_update_checker = PucFactory::buildUpdateChecker(
     'ovenpress-triple-cache'
 );
 $ovenpress_triple_cache_update_checker->getVcsApi()->enableReleaseAssets();
-
-$myUpdateChecker->getVcsApi()->enableReleaseAssets();
