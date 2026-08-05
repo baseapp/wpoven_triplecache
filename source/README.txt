@@ -1,7 +1,7 @@
 === OvenPress Triple Cache ===
 Contributors: https://www.wpoven.com/
 Requires at least: 6.2
-Tested up to: 7.0.2
+Tested up to: 7.0
 Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
