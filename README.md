@@ -4,7 +4,7 @@
 
 **Contributors:** [WPOven](https://www.wpoven.com/)  
 **Requires at least:** 6.2  
-**Tested up to:** 7.0
+**Tested up to:** 7.0.2
 **Stable tag:** 1.0.3 
 **License:** GPLv2 or later  
 **License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)  
@@ -21,7 +21,7 @@ The OvenPress Triple Cache plugin for WordPress uses Cloudflare integration to d
 1. **Download the Plugin:**
    - To get the latest version of OvenPress Triple Cache, you can either:
      - [Visit WPOven's website](https://www.wpoven.com/plugins/ovenpress-triple-cache) to learn more about the plugin.
-     - Download directly from the GitHub repository: [Download](https://github.com/baseapp/ovenpress_triplecache/releases/download/1.0.1/ovenpress-triple-cache-2026-04-06.zip).
+     - Download directly from the GitHub repository: [Download](https://github.com/baseapp/ovenpress_triplecache/releases/download/1.0.3/ovenpress-triple-cache-2026-08-05.zip).
 
 
 2. **Upload the Plugin:**
