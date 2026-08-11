@@ -1379,18 +1379,18 @@ class Ovenpress_Triple_Cache_Admin
 				'id'    => 'redis_not_running_info',
 				'type'  => 'info',
 				'style' => 'critical',
-				'desc'  => esc_html__('Redis server is not detected or not running.', 'ovenpress-triple-cache'),
+				'desc'  => esc_html__('Redis server is not detected or not running.', 'OvenPress Triple Cache'),
 			);
 		} else {
 
 			$result[] = array(
 				'id'    => 'redis_enable',
 				'type'  => 'switch',
-				'title' => esc_html__('Redis Object Cache', 'ovenpress-triple-cache'),
-				'desc'  => esc_html__('Enable for Redis-based WordPress object caching.', 'ovenpress-triple-cache'),
+				'title' => esc_html__('Redis Object Cache', 'OvenPress Triple Cache'),
+				'desc'  => esc_html__('Enable for Redis-based WordPress object caching.', 'OvenPress Triple Cache'),
 				'subtitle' => '<button type="button" style="color:green;">Redis server running</button>',
-				'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
-				'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
+				'on'  => esc_html__('Enable', 'OvenPress Triple Cache'),
+				'off' => esc_html__('Disable', 'OvenPress Triple Cache'),
 				'default' => false,
 			);
 		}
@@ -1398,42 +1398,42 @@ class Ovenpress_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'file_enable',
 			'type'  => 'switch',
-			'title' => esc_html__('File Object Cache', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Enable for File-based WordPress object caching.', 'ovenpress-triple-cache'),
-			'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
-			'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
+			'title' => esc_html__('File Object Cache', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Enable for File-based WordPress object caching.', 'OvenPress Triple Cache'),
+			'on'  => esc_html__('Enable', 'OvenPress Triple Cache'),
+			'off' => esc_html__('Disable', 'OvenPress Triple Cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'redis_host',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Host', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Enter your Redis server hostname or IP address. Default is localhost (127.0.0.1).', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Redis Host', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Enter your Redis server hostname or IP address. Default is localhost (127.0.0.1).', 'OvenPress Triple Cache'),
 			'default' => '127.0.0.1',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_port',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Port', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Default Redis port is 6379. Change only if your server uses a custom port.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Redis Port', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Default Redis port is 6379. Change only if your server uses a custom port.', 'OvenPress Triple Cache'),
 			'default' => '6379',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_password',
 			'type'  => 'text',
-			'title' => esc_html__('Redis Password', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Enter Redis authentication password only if Redis requires AUTH. Leave blank if not configured.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Redis Password', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Enter Redis authentication password only if Redis requires AUTH. Leave blank if not configured.', 'OvenPress Triple Cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'redis_database',
 			'type'  => 'spinner',
-			'title' => esc_html__('Redis Database Index', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Select the Redis database number (0–100). Using a separate DB ensures clean cache storage.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Redis Database Index', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Select the Redis database number (0–100). Using a separate DB ensures clean cache storage.', 'OvenPress Triple Cache'),
 			'default' => 0,
 			'min' => 0,
 			'max' => 100,
@@ -1465,7 +1465,7 @@ class Ovenpress_Triple_Cache_Admin
 			$result[] = array(
 				'id'      => 'redis_flush',
 				'type'    => 'raw',
-				'title'   => esc_html__(' ', 'ovenpress-triple-cache'),
+				'title'   => esc_html__(' ', 'OvenPress Triple Cache'),
 				'content' => $flush_cache_button,
 			);
 		}
@@ -1481,10 +1481,10 @@ class Ovenpress_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'varnish_cache_enable',
 			'type'  => 'switch',
-			'title' => esc_html__('Varnish Cache', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Enable to purge Varnish cache when content is updated.', 'ovenpress-triple-cache'),
-			'on'  => esc_html__('Enable', 'ovenpress-triple-cache'),
-			'off' => esc_html__('Disable', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Varnish Cache', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Enable to purge Varnish cache when content is updated.', 'OvenPress Triple Cache'),
+			'on'  => esc_html__('Enable', 'OvenPress Triple Cache'),
+			'off' => esc_html__('Disable', 'OvenPress Triple Cache'),
 			'default' => true,
 		);
 
@@ -1503,7 +1503,7 @@ class Ovenpress_Triple_Cache_Admin
 		$result[] = array(
 			'id'      => 'varnish_flush',
 			'type'    => 'raw',
-			'title'   => esc_html__(' ', 'ovenpress-triple-cache'),
+			'title'   => esc_html__(' ', 'OvenPress Triple Cache'),
 			'content' => $varnish_cache_button,
 		);
 
@@ -1522,32 +1522,32 @@ class Ovenpress_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'jsopt_defer',
 			'type'  => 'switch',
-			'title' => esc_html__('Defer JavaScript', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Add the defer attribute to external JS files to speed up initial rendering.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Defer JavaScript', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Add the defer attribute to external JS files to speed up initial rendering.', 'OvenPress Triple Cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_delay',
 			'type'  => 'switch',
-			'title' => esc_html__('Delay JavaScript Execution', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Delay non-critical JS until the user interacts with the page (scroll, click, move).', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Delay JavaScript Execution', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Delay non-critical JS until the user interacts with the page (scroll, click, move).', 'OvenPress Triple Cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_exclude_patterns',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude JS Files / Patterns', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Add keywords or filenames (one per line) for scripts that should NOT be deferred or delayed.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Exclude JS Files / Patterns', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Add keywords or filenames (one per line) for scripts that should NOT be deferred or delayed.', 'OvenPress Triple Cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'jsopt_safe_mode',
 			'type'  => 'switch',
-			'title' => esc_html__('Safe Mode for JS Optimization', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Prevents optimization from breaking inline JavaScript and essential scripts.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Safe Mode for JS Optimization', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Prevents optimization from breaking inline JavaScript and essential scripts.', 'OvenPress Triple Cache'),
 			'default' => false,
 		);
 
@@ -1565,24 +1565,24 @@ class Ovenpress_Triple_Cache_Admin
 		$result[] = array(
 			'id'    => 'lazyload_images',
 			'type'  => 'switch',
-			'title' => esc_html__('Lazy Load Iframes/Videos', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Apply lazy loading to YouTube videos, embeds, and iframe content.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Lazy Load Iframes/Videos', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Apply lazy loading to YouTube videos, embeds, and iframe content.', 'OvenPress Triple Cache'),
 			'default' => false,
 		);
 
 		$result[] = array(
 			'id'    => 'lazyload_exclude_classes',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude Classes from Lazy Load', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Add CSS Classes (one per line) for images or elements that should NOT be lazy-loaded.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Exclude Classes from Lazy Load', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Add CSS Classes (one per line) for images or elements that should NOT be lazy-loaded.', 'OvenPress Triple Cache'),
 			'default' => '',
 		);
 
 		$result[] = array(
 			'id'    => 'lazyload_exclude_selectors',
 			'type'  => 'textarea',
-			'title' => esc_html__('Exclude Selectors from Lazy Load', 'ovenpress-triple-cache'),
-			'desc'  => esc_html__('Add CSS selectors (one per line) for images or elements that should NOT be lazy-loaded.', 'ovenpress-triple-cache'),
+			'title' => esc_html__('Exclude Selectors from Lazy Load', 'OvenPress Triple Cache'),
+			'desc'  => esc_html__('Add CSS selectors (one per line) for images or elements that should NOT be lazy-loaded.', 'OvenPress Triple Cache'),
 			'default' => '',
 		);
 
@@ -1731,6 +1731,6 @@ class Ovenpress_Triple_Cache_Admin
 	{
 		$this->_ovenpress_triple_cache = $ovenpress_triple_cache;
 		add_action('admin_menu', array($this, 'ovenpress_triple_cache_menu'));
-		add_action('admin_init', array($this, 'setup_gui'));
+		$this->setup_gui();
 	}
 }

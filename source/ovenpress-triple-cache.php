@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       OvenPress Triple Cache
  * Plugin URI:        https://www.wpoven.com/plugins/ovenpress-triple-cache
- * Description:       Cloudflare Caching
+ * Description:       Cloudflare caching plus Redis object caching, JavaScript defer and lazyload integration for WordPress.
  * Version:           1.0.3
  * Author:            WPOven
  * Author URI:        https://www.wpoven.com/
